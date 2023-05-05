@@ -5,56 +5,31 @@
 
 #include "ui.h"
 #include "nmea_parser.h"
-#include "esp_log.h"
 #include <stdio.h>
 
-// static const char *TAG = "ui_event";
 #define STRLEN 11
 extern gps_t *gps;
 
 void now_speed_call(lv_event_t *e)
 {
+    // Your code here
     char str[STRLEN];
     // Your code here
     if (gps != NULL)
     {
         snprintf(str, 5, "%02d", (uint8_t)gps->speed);
         lv_label_set_text_fmt(ui_speed, "%s", str);
+
         lv_label_set_text_fmt(ui_comp_get_child(ui_statusBar, UI_COMP_STATUSBAR_LABEL7), "%02d : %02d", gps->tim.hour + TIME_ZONE, gps->tim.minute);
         lv_label_set_text_fmt(ui_comp_get_child(ui_statusBar2, UI_COMP_STATUSBAR_LABEL7), "%02d : %02d", gps->tim.hour + TIME_ZONE, gps->tim.minute);
-    }
-}
 
-void Longitude_call(lv_event_t *e)
-{
-    // Your code here
-
-    if (gps != NULL)
-    {
-        char str[STRLEN];
-        snprintf(str, 9, "%.05f", gps->longitude);
-        lv_label_set_text_fmt(ui_lonData, "%s°E", str);
-    }
-}
-
-void Latitude_call(lv_event_t *e)
-{
-    // Your code here
-    if (gps != NULL)
-    {
-        char str[STRLEN];
         snprintf(str, 9, "%.05f", gps->latitude);
         lv_label_set_text_fmt(ui_latData, "%s°N", str);
-    }
-}
 
-void Altitude_call(lv_event_t *e)
-{
-    // Your code here
-    if (gps != NULL)
-    {
-        char str[STRLEN];
         snprintf(str, 5, "%.02f", gps->altitude);
         lv_label_set_text_fmt(ui_altData, "%sm", str);
+
+        snprintf(str, 9, "%.05f", gps->longitude);
+        lv_label_set_text_fmt(ui_lonData, "%s°E", str);
     }
 }

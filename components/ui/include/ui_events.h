@@ -7,14 +7,10 @@
 #define _UI_EVENTS_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-    void now_speed_call(lv_event_t *e);
-    void Longitude_call(lv_event_t *e);
-    void Latitude_call(lv_event_t *e);
-    void Altitude_call(lv_event_t *e);
+void now_speed_call(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -30,13 +30,10 @@ lv_obj_t *ui_sysInfo;
 lv_obj_t *ui_statusBar2;
 lv_obj_t *ui_Panel2;
 lv_obj_t *ui_longitude;
-void ui_event_lonData(lv_event_t *e);
 lv_obj_t *ui_lonData;
 lv_obj_t *ui_latitude;
-void ui_event_latData(lv_event_t *e);
 lv_obj_t *ui_latData;
 lv_obj_t *ui_altitude;
-void ui_event_altData(lv_event_t *e);
 lv_obj_t *ui_altData;
 void ui_event____initial_actions0(lv_event_t *e);
 lv_obj_t *ui____initial_actions0;
@@ -140,46 +137,19 @@ void ui_event_menuBtn(lv_event_t *e)
     lv_obj_t *target = lv_event_get_target(e);
     if (event_code == LV_EVENT_CLICKED)
     {
-        _ui_screen_change(ui_sysInfo, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0);
+        _ui_screen_change(ui_sysInfo, LV_SCR_LOAD_ANIM_MOVE_TOP, 300, 0);
     }
 }
 void ui_event_sysInfo(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t *target = lv_event_get_target(e);
-    if (event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT)
+    if (event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_BOTTOM)
     {
-        _ui_screen_change(ui_displayScr, LV_SCR_LOAD_ANIM_NONE, 500, 0);
         btnsAnim_Animation(ui_btns, 0);
         kmhAnim_Animation(ui_Dial, 0);
         _ui_state_modify(ui_menuBtn, LV_STATE_CHECKED, _UI_MODIFY_STATE_REMOVE);
-    }
-}
-void ui_event_lonData(lv_event_t *e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    if (event_code == LV_EVENT_VALUE_CHANGED)
-    {
-        Longitude_call(e);
-    }
-}
-void ui_event_latData(lv_event_t *e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    if (event_code == LV_EVENT_VALUE_CHANGED)
-    {
-        Latitude_call(e);
-    }
-}
-void ui_event_altData(lv_event_t *e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    if (event_code == LV_EVENT_VALUE_CHANGED)
-    {
-        Altitude_call(e);
+        _ui_screen_change(ui_displayScr, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 500, 0);
     }
 }
 void ui_event____initial_actions0(lv_event_t *e)
@@ -419,7 +389,7 @@ void ui_sysInfo_screen_init(void)
     lv_obj_set_x(ui_latitude, 25);
     lv_obj_set_y(ui_latitude, 26);
     lv_obj_set_align(ui_latitude, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_latitude, "Latitude  ");
+    lv_label_set_text(ui_latitude, "Latitude");
 
     ui_latData = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_latData, LV_SIZE_CONTENT);  /// 1
@@ -433,7 +403,7 @@ void ui_sysInfo_screen_init(void)
     lv_obj_set_width(ui_altitude, LV_SIZE_CONTENT);  /// 1
     lv_obj_set_height(ui_altitude, LV_SIZE_CONTENT); /// 1
     lv_obj_set_align(ui_altitude, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_altitude, "Altitude   ");
+    lv_label_set_text(ui_altitude, "Altitude");
 
     ui_altData = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_altData, LV_SIZE_CONTENT);  /// 1
@@ -441,9 +411,6 @@ void ui_sysInfo_screen_init(void)
     lv_obj_set_align(ui_altData, LV_ALIGN_CENTER);
     lv_label_set_text(ui_altData, "0m");
 
-    lv_obj_add_event_cb(ui_lonData, ui_event_lonData, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_latData, ui_event_latData, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_altData, ui_event_altData, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_sysInfo, ui_event_sysInfo, LV_EVENT_ALL, NULL);
 }
 

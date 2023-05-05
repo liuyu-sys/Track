@@ -34,10 +34,7 @@ void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int
                  gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second,
                  gps->latitude, gps->longitude, gps->altitude, gps->speed);
 
-        lv_event_send(ui_latData, LV_EVENT_VALUE_CHANGED, NULL);
-        lv_event_send(ui_lonData, LV_EVENT_VALUE_CHANGED, NULL);
         lv_event_send(ui_speed, LV_EVENT_VALUE_CHANGED, NULL);
-        lv_event_send(ui_altData, LV_EVENT_VALUE_CHANGED, NULL);
         break;
     case GPS_UNKNOWN:
         /* print unknown statements */
