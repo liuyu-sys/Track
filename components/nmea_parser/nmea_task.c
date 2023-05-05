@@ -4,12 +4,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+#include "lvgl/lvgl.h"
+#include "ui.h"
 
 static const char *TAG = "gps_nmea";
-
-#define TIME_ZONE (+8)   // Beijing Time
-#define YEAR_BASE (2000) // date in GPS starts from 2000
-
+gps_t *gps = NULL;
 /**
  * @brief GPS Event Handler
  *
@@ -20,7 +19,6 @@ static const char *TAG = "gps_nmea";
  */
 void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
-    gps_t *gps = NULL;
     switch (event_id)
     {
     case GPS_UPDATE:
@@ -35,10 +33,15 @@ void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int
                  gps->date.year + YEAR_BASE, gps->date.month, gps->date.day,
                  gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second,
                  gps->latitude, gps->longitude, gps->altitude, gps->speed);
+
+        lv_event_send(ui_latData, LV_EVENT_VALUE_CHANGED, NULL);
+        lv_event_send(ui_lonData, LV_EVENT_VALUE_CHANGED, NULL);
+        lv_event_send(ui_speed, LV_EVENT_VALUE_CHANGED, NULL);
+        lv_event_send(ui_altData, LV_EVENT_VALUE_CHANGED, NULL);
         break;
     case GPS_UNKNOWN:
         /* print unknown statements */
-        ESP_LOGW(TAG, "Unknown statement:%s", (char *)event_data);
+        ESP_LOGD(TAG, "Unknown statement:%s", (char *)event_data);
         break;
     default:
         break;

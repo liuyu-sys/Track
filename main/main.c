@@ -98,7 +98,8 @@ void create_demo_application(void)
     /* Otherwise we show the selected demo */
 
 #if defined CONFIG_LV_USE_DEMO_WIDGETS
-    lv_demo_widgets();
+    // lv_demo_widgets();
+    ui_init();
 #elif defined CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
     lv_demo_widgets(); // 不明自动滚动的Demo在哪儿
 #elif defined CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
@@ -115,7 +116,7 @@ void create_demo_application(void)
 #endif
 #endif
 }
-extern "C" void app_main(void)
+void app_main(void)
 {
     xTaskCreatePinnedToCore(gui_task, "gui task", 1024 * 8, NULL, 1, NULL, 0);
     xTaskCreate(nmea_task, "nmea_task", 1024 * 2, NULL, 2, NULL);

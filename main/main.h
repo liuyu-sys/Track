@@ -14,7 +14,7 @@
 #include "esp_log.h"
 #include <string.h>
 
-#include "PageManager.h"
+#include "ui.h"
 
 void create_demo_application(void);
 void gui_task(void *arg);

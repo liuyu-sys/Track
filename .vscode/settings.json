@@ -15,9 +15,15 @@
         "lv_demo_widgets.h": "c",
         "lv_demo_benchmark.h": "c",
         "semphr.h": "c",
-        "lvgl_helpers.h": "c"
+        "lvgl_helpers.h": "c",
+        "*.ipp": "c",
+        "app.h": "c",
+        "ui.h": "c",
+        "nmea_task.h": "c",
+        "nmea_parser.h": "c"
     },
     "idf.flashType": "UART",
     "idf.portWin": "COM3",
-    "idf.adapterTargetName": "esp32"
+    "idf.adapterTargetName": "esp32",
+    "idf.monitorBaudRate": "115200"
 }

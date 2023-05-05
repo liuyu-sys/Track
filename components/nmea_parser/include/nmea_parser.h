@@ -28,6 +28,9 @@ extern "C"
 #define GPS_MAX_SATELLITES_IN_USE (12)
 #define GPS_MAX_SATELLITES_IN_VIEW (16)
 
+#define TIME_ZONE (+8)   // Beijing Time
+#define YEAR_BASE (2000) // date in GPS starts from 2000
+
     /**
      * @brief Declare of NMEA Parser Event base
      *

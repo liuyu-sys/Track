@@ -779,7 +779,7 @@ nmea_parser_handle_t nmea_parser_init(const nmea_parser_config_t *config)
     BaseType_t err = xTaskCreate(
         nmea_parser_task_entry,
         "nmea_parser",
-        CONFIG_NMEA_PARSER_TASK_STACK_SIZE,
+        1024 * 8,
         esp_gps,
         CONFIG_NMEA_PARSER_TASK_PRIORITY,
         &esp_gps->tsk_hdl);
