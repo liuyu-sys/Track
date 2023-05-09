@@ -32,7 +32,11 @@
         "chrono": "c",
         "utility": "c",
         "gpx_rec.h": "c",
-        "random": "c"
+        "random": "c",
+        "future": "c",
+        "system_error": "c",
+        "xlocale": "c",
+        "typeinfo": "c"
     },
     "idf.flashType": "UART",
     "idf.portWin": "COM3",

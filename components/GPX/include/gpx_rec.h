@@ -5,6 +5,7 @@
 #include "stdio.h"
 #include "GPX.h"
 #include "esp_log.h"
+#include "string.h"
 
 typedef enum
 {

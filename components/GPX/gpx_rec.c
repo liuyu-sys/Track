@@ -1,7 +1,7 @@
 #include "gpx_rec.h"
 
 #define RECORDER_GPX_TIME_FMT "%d-%02d-%02dT%02d:%02d:%02dZ"
-#define FILE_PATH_FORMAT "/sdcard/TRK_%d%02d%02d_%02d%02d%02d.gpx"
+#define FILE_PATH_FORMAT "/sdcard/%02d%02d%02d%02d.gpx"
 #define RECORDER_GPX_META_NAME "Track 1.0"
 #define RECORDER_GPX_META_DESC "https://github.com/liuyu-sys"
 
@@ -25,11 +25,15 @@ void rec_start(gps_t *gps_gpx)
 {
     ESP_LOGI(TAG, "Track record start");
 
-    char filepath[512];
-    snprintf(filepath, sizeof(filepath), FILE_PATH_FORMAT, gps_gpx->date.year + YEAR_BASE, gps_gpx->date.month, gps_gpx->date.day,
-             gps_gpx->tim.hour + TIME_ZONE, gps_gpx->tim.minute, gps_gpx->tim.second);
-    ESP_LOGE(TAG, "fileptah = %s", filepath);
-    FILE *file_p = fopen("/sdcard/1.gpx", "w");
+    char filepath[50];
+    memset(filepath, 0, sizeof(filepath));
+    snprintf(filepath, sizeof(filepath), FILE_PATH_FORMAT, gps_gpx->date.month, gps_gpx->date.day,
+             gps_gpx->tim.hour + TIME_ZONE, gps_gpx->tim.minute);
+
+    ESP_LOGI(TAG, "filepath = %s, len(filepath) = %d", filepath, strlen(filepath));
+
+    FILE *file_p = fopen(filepath, "w+");
+
     if (file_p == NULL)
     {
         ESP_LOGE(TAG, "Failed to open file for writing");
@@ -53,20 +57,12 @@ void rec_start(gps_t *gps_gpx)
 }
 void rec_point(gps_t *gps_gpx)
 {
-    if (recorder.active != true)
+    if (recorder.active != true || recorder.file_p == NULL)
     {
         ESP_LOGE(TAG, "rec_point active error!");
         return;
     }
     ESP_LOGI(TAG, "Track recording...");
-    ESP_LOGI(TAG, "%d/%d/%d %d:%d:%d => \r\n"
-                  "\t\t\t\t\t\tlatitude   = %.05f°N\r\n"
-                  "\t\t\t\t\t\tlongitude = %.05f°E\r\n"
-                  "\t\t\t\t\t\taltitude   = %.02fm\r\n"
-                  "\t\t\t\t\t\tspeed      = %fm/s",
-             gps_gpx->date.year + YEAR_BASE, gps_gpx->date.month, gps_gpx->date.day,
-             gps_gpx->tim.hour + TIME_ZONE, gps_gpx->tim.minute, gps_gpx->tim.second,
-             gps_gpx->latitude, gps_gpx->longitude, gps_gpx->altitude, gps_gpx->speed);
     char timeBuf[64];
     snprintf(
         timeBuf, sizeof(timeBuf), "%d-%02d-%02dT%02d:%02d:%02dZ", gps_gpx->date.year + YEAR_BASE, gps_gpx->date.month, gps_gpx->date.day,
@@ -89,6 +85,11 @@ void rec_point(gps_t *gps_gpx)
 void rec_stop()
 {
 
+    if (recorder.file_p == NULL)
+    {
+        ESP_LOGE(TAG, "rec_stop file_p == NULL");
+        return;
+    }
     ESP_LOGI(TAG, "Track record end");
     Recorder_FileWriteString(recorder.file_p, getTrakSegClose());
 
@@ -111,7 +112,7 @@ void rec_event_handle(void *data)
     case RECORDER_CMD_START:
         if (recorder.active == false)
             rec_start(gps_data);
-        if (recorder.active == true)
+        else if (recorder.active == true)
             rec_point(gps_data);
         break;
     case RECORDER_CMD_PAUSE:
@@ -123,6 +124,7 @@ void rec_event_handle(void *data)
         break;
     case RECORDER_CMD_STOP:
         rec_stop();
+        rec_init();
         recorder.recInfo.cmd = RECORDER_CMD_NONE;
         break;
     default:
