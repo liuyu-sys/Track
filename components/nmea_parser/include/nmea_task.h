@@ -8,7 +8,7 @@ extern "C"
 
 #include "nmea_parser.h"
     void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
-    void nmea_task(void *arg);
+    void nmea_init(void);
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@ extern "C"
 #endif
 
 #include "lvgl.h"
-
+#include "gpx_rec.h"
 #include "ui_comp.h"
 #include "ui_comp_hook.h"
 #include "ui_events.h"

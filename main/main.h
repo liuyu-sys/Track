@@ -13,8 +13,12 @@
 #include "nmea_task.h"
 #include "esp_log.h"
 #include <string.h>
+#include "driver/gpio.h"
 
+#include "sd_card_fatfs.h"
 #include "ui.h"
+#include "gpx_rec.h"
+#include "nmea_parser.h"
 
 void create_demo_application(void);
 void gui_task(void *arg);

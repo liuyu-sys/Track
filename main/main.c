@@ -11,6 +11,8 @@
 #include "main.h"
 
 SemaphoreHandle_t xGuiSemaphore;
+TaskHandle_t gui_task_hand;
+TaskHandle_t sd_card_task_hand;
 
 void lv_tick_task(void *arg)
 {
@@ -23,7 +25,6 @@ void gui_task(void *arg)
     xGuiSemaphore = xSemaphoreCreateMutex();
     lv_init();          // lvgl内核初始化
     lvgl_driver_init(); // lvgl显示接口初始化
-
     /* Example for 1) */
     static lv_disp_draw_buf_t draw_buf;
     // 配置刷屏用的双缓存区大小，一般给分配的空间为 (CONFIG_LV_HOR_RES_MAX * 40~80)
@@ -51,11 +52,7 @@ void gui_task(void *arg)
 #endif
 
     esp_register_freertos_tick_hook((esp_freertos_tick_cb_t)lv_tick_task);
-
-    // lv_demo_widgets();
-    // lv_demo_music();
-    // lv_demo_benchmark();
-    /* Create the demo application */
+    // ui_init();
     create_demo_application(); // 运行个人Demo时，请将这句替换
 
     while (1)
@@ -116,8 +113,28 @@ void create_demo_application(void)
 #endif
 #endif
 }
+
+void sd_task(void *arg)
+{
+    static const char *TAG = "sd_fatfs_task";
+    sdmmc_card_t *card = sd_card_fatfs_spi_init();
+    while (!card)
+    {
+        // 验证错误，如果返回值为0，则SD卡初始化及FATFS挂载失败，重试
+        ESP_LOGE(TAG, "Failed !! %d Retry!!", false);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        card = sd_card_fatfs_spi_init();
+    }
+    rec_init();
+    while (true)
+    {
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        sdmmc_card_print_info(stdout, card);
+    }
+}
 void app_main(void)
 {
-    xTaskCreatePinnedToCore(gui_task, "gui task", 1024 * 8, NULL, 1, NULL, 0);
-    xTaskCreate(nmea_task, "nmea_task", 1024 * 2, NULL, 2, NULL);
+    nmea_init();
+    xTaskCreatePinnedToCore(gui_task, "gui task", 1024 * 8, NULL, 1, &gui_task_hand, 0);
+    xTaskCreate(sd_task, "sd_card task", 1024 * 3, NULL, 0, &sd_card_task_hand);
 }

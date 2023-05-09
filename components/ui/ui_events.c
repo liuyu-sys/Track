@@ -8,11 +8,11 @@
 #include <stdio.h>
 
 #define STRLEN 11
-extern gps_t *gps;
 
 void now_speed_call(lv_event_t *e)
 {
     // Your code here
+    gps_t *gps = (gps_t *)lv_event_get_param(e);
     char str[STRLEN];
     // Your code here
     if (gps != NULL)
