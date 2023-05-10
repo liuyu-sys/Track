@@ -507,8 +507,8 @@ void ui_mapScr_screen_init(void)
     ui_history = lv_dropdown_create(ui_mapScr);
     lv_obj_set_width(ui_history, 201);
     lv_obj_set_height(ui_history, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_history, 3);
-    lv_obj_set_y(ui_history, -123);
+    lv_obj_set_x(ui_history, 0);
+    lv_obj_set_y(ui_history, -120);
     lv_obj_set_align(ui_history, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_history, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
 
