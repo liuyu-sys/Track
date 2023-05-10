@@ -125,16 +125,17 @@ void sd_task(void *arg)
         vTaskDelay(200 / portTICK_PERIOD_MS);
         card = sd_card_fatfs_spi_init();
     }
-    rec_init();
+
     while (true)
     {
         vTaskDelay(2000 / portTICK_PERIOD_MS);
-        sdmmc_card_print_info(stdout, card);
     }
 }
 void app_main(void)
 {
     nmea_init();
+
     xTaskCreatePinnedToCore(gui_task, "gui task", 1024 * 8, NULL, 1, &gui_task_hand, 0);
     xTaskCreate(sd_task, "sd_card task", 1024 * 3, NULL, 0, &sd_card_task_hand);
+    rec_timer_init();
 }

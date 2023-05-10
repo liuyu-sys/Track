@@ -18,6 +18,11 @@ lv_obj_t *ui_AVG;
 lv_obj_t *ui_Calorie;
 lv_obj_t *ui_Trip;
 lv_obj_t *ui_Time;
+lv_obj_t *ui_menuBtn;
+lv_obj_t *ui_timeData;
+lv_obj_t *ui_avgData;
+lv_obj_t *ui_calData;
+lv_obj_t *ui_tripData;
 lv_obj_t *ui_statusBar;
 lv_obj_t *ui_btns;
 lv_obj_t *ui_mapBtn;
@@ -35,6 +40,7 @@ lv_obj_t *ui_latitude;
 lv_obj_t *ui_latData;
 lv_obj_t *ui_altitude;
 lv_obj_t *ui_altData;
+
 void ui_event____initial_actions0(lv_event_t *e);
 lv_obj_t *ui____initial_actions0;
 
@@ -115,77 +121,17 @@ void btnsAnim_Animation(lv_obj_t *TargetObject, int delay)
 void ui_event_speed(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     if (event_code == LV_EVENT_VALUE_CHANGED)
     {
         now_speed_call(e);
-    }
-}
-void rec_btn_style_set(lv_color_t bg_color, lv_color_t img_color, const void *img, lv_style_selector_t PART)
-{
-    lv_obj_set_style_bg_color(ui_statusBtn, bg_color, PART);
-    lv_obj_set_style_bg_opa(ui_statusBtn, 255, PART);
-    lv_obj_set_style_bg_img_src(ui_statusBtn, img, PART);
-    lv_obj_set_style_bg_img_recolor(ui_statusBtn, img_color, PART);
-    lv_obj_set_style_bg_img_recolor_opa(ui_statusBtn, 255, PART);
-}
-void set_text_statusBar(char *str)
-{
-    lv_label_set_text(ui_comp_get_child(ui_statusBar, UI_COMP_STATUSBAR_LABEL8), str);
-    lv_label_set_text(ui_comp_get_child(ui_statusBar2, UI_COMP_STATUSBAR_LABEL8), str);
-}
-void onRecord(bool longPress)
-{
-    static uint8_t recState = 0;
-    switch (recState)
-    {
-    case 0: // 准备
-        if (!longPress)
-        {
-            // rec_start();
-            recState = 1;
-            set_text_statusBar("REC");
-            rec_btn_style_set(lv_color_hex(0xFBA414), lv_color_hex(0x2C2C2C), &ui_img_m_stop_png, LV_PART_MAIN);
-            recorder.recInfo.cmd = RECORDER_CMD_START;
-        }
-        break;
-    case 1: // REC
-        if (!longPress)
-        {
-            recState = 2;
-            set_text_statusBar("PUASE");
-            rec_btn_style_set(lv_color_hex(0xFBA414), lv_color_hex(0x2C2C2C), &ui_img_m_start_png, LV_PART_MAIN);
-            recorder.recInfo.cmd = RECORDER_CMD_PAUSE;
-            recorder.active = false;
-        }
-        break;
-    case 2: // 停止
-        if (!longPress)
-        {
-            recState = 1;
-            set_text_statusBar("REC");
-            rec_btn_style_set(lv_color_hex(0xFBA414), lv_color_hex(0x2C2C2C), &ui_img_m_stop_png, LV_PART_MAIN);
-            recorder.recInfo.cmd = RECORDER_CMD_CONTINUE;
-            recorder.active = true;
-        }
-        else
-        {
-            recState = 0;
-            set_text_statusBar("");
-            rec_btn_style_set(lv_color_hex(0x2C2C2C), lv_color_hex(0xFBA414), &ui_img_m_start_png, LV_PART_MAIN);
-            recorder.recInfo.cmd = RECORDER_CMD_STOP;
-        }
-        break;
-
-    default:
-        break;
     }
 }
 
 void ui_event_statusBtn(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
 
     if (event_code == LV_EVENT_SHORT_CLICKED)
     {
@@ -195,11 +141,19 @@ void ui_event_statusBtn(lv_event_t *e)
     {
         onRecord(true);
     }
+    else if (event_code == LV_EVENT_KEY)
+    {
+        recState = 0;
+        set_text_statusBar("error");
+        rec_btn_style_set(lv_color_hex(0x2C2C2C), lv_color_hex(0xFBA414), &ui_img_m_start_png, LV_PART_MAIN);
+        recorder.recInfo.cmd = RECORDER_CMD_STOP;
+        xTimerStop(rec_timer, 0);
+    }
 }
 void ui_event_menuBtn(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     if (event_code == LV_EVENT_CLICKED)
     {
         _ui_screen_change(ui_sysInfo, LV_SCR_LOAD_ANIM_MOVE_TOP, 300, 0);
@@ -208,7 +162,7 @@ void ui_event_menuBtn(lv_event_t *e)
 void ui_event_sysInfo(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     if (event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_BOTTOM)
     {
         btnsAnim_Animation(ui_btns, 0);
@@ -220,7 +174,7 @@ void ui_event_sysInfo(lv_event_t *e)
 void ui_event____initial_actions0(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     if (event_code == LV_EVENT_SCREEN_LOAD_START)
     {
         kmhAnim_Animation(ui_Dial, 0);
@@ -301,6 +255,46 @@ void ui_displayScr_screen_init(void)
     lv_obj_set_y(ui_Time, 0);
     lv_obj_set_align(ui_Time, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Time, "Time");
+
+    ui_timeData = lv_label_create(ui_displayScr);
+    lv_obj_set_width(ui_timeData, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_timeData, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_timeData, 58);
+    lv_obj_set_y(ui_timeData, -19);
+    lv_obj_set_align(ui_timeData, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_timeData, "00:00");
+    lv_obj_set_style_text_color(ui_timeData, lv_color_hex(0xFBA414), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_timeData, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_avgData = lv_label_create(ui_displayScr);
+    lv_obj_set_width(ui_avgData, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_avgData, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_avgData, -58);
+    lv_obj_set_y(ui_avgData, -19);
+    lv_obj_set_align(ui_avgData, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_avgData, "00 km/h");
+    lv_obj_set_style_text_color(ui_avgData, lv_color_hex(0xFBA414), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_avgData, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_calData = lv_label_create(ui_displayScr);
+    lv_obj_set_width(ui_calData, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_calData, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_calData, 58);
+    lv_obj_set_y(ui_calData, 36);
+    lv_obj_set_align(ui_calData, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_calData, "0 k");
+    lv_obj_set_style_text_color(ui_calData, lv_color_hex(0xFBA414), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_calData, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_tripData = lv_label_create(ui_displayScr);
+    lv_obj_set_width(ui_tripData, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_tripData, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_tripData, -58);
+    lv_obj_set_y(ui_tripData, 36);
+    lv_obj_set_align(ui_tripData, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_tripData, "00 km");
+    lv_obj_set_style_text_color(ui_tripData, lv_color_hex(0xFBA414), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_tripData, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_statusBar = ui_statusBar_create(ui_displayScr);
     lv_obj_set_x(ui_statusBar, 0);
@@ -410,6 +404,7 @@ void ui_displayScr_screen_init(void)
     lv_obj_add_event_cb(ui_speed, ui_event_speed, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_statusBtn, ui_event_statusBtn, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_menuBtn, ui_event_menuBtn, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_timeData, ui_rec_update, LV_EVENT_ALL, NULL);
 }
 void ui_sysInfo_screen_init(void)
 {

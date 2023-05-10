@@ -16,6 +16,7 @@ extern "C"
 #include "ui_comp.h"
 #include "ui_comp_hook.h"
 #include "ui_events.h"
+#include "rec_timer.h"
     void kmhAnim_Animation(lv_obj_t *TargetObject, int delay);
     void btnsAnim_Animation(lv_obj_t *TargetObject, int delay);
     extern lv_obj_t *ui_displayScr;
@@ -27,6 +28,11 @@ extern "C"
     extern lv_obj_t *ui_Calorie;
     extern lv_obj_t *ui_Trip;
     extern lv_obj_t *ui_Time;
+    extern lv_obj_t *ui_menuBtn;
+    extern lv_obj_t *ui_timeData;
+    extern lv_obj_t *ui_avgData;
+    extern lv_obj_t *ui_calData;
+    extern lv_obj_t *ui_tripData;
     extern lv_obj_t *ui_statusBar;
     extern lv_obj_t *ui_btns;
     extern lv_obj_t *ui_mapBtn;

@@ -6,6 +6,9 @@
 #include "GPX.h"
 #include "esp_log.h"
 #include "string.h"
+#include "lvgl/lvgl.h"
+#include "ui.h"
+#include "cJSON.h"
 
 typedef enum
 {
@@ -20,6 +23,7 @@ typedef struct
 {
     Recorder_Cmd_t cmd;
     uint16_t time;
+    float avg_speed;
 } Recorder_Info_t;
 
 typedef struct

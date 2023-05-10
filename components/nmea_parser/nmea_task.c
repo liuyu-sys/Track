@@ -7,6 +7,7 @@
 #include "lvgl/lvgl.h"
 #include "ui.h"
 #include "gpx_rec.h"
+#include "rec_timer.h"
 
 static const char *TAG = "gps_nmea";
 
@@ -20,6 +21,8 @@ static const char *TAG = "gps_nmea";
  */
 void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
+    // int speed_data[11] = {10, 11, 12, 13, 14, 15, 12, 16, 12, 17, 14};
+    // static uint32_t cnt = 0;
     gps_t *gps = NULL;
     switch (event_id)
     {
@@ -34,6 +37,11 @@ void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int
                  gps->date.year + YEAR_BASE, gps->date.month, gps->date.day,
                  gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second,
                  gps->latitude, gps->longitude, gps->altitude, gps->speed);
+        // gps->speed = speed_data[cnt++];
+        // if (cnt == 11)
+        // {
+        //     cnt = 10;
+        // }
         rec_event_handle(gps);
         lv_event_send(ui_speed, LV_EVENT_VALUE_CHANGED, gps);
         break;

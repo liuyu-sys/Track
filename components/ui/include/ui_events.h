@@ -7,11 +7,17 @@
 #define _UI_EVENTS_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void now_speed_call(lv_event_t * e);
+    extern uint8_t recState;
 
+    void ui_rec_update(lv_event_t *e);
+    void now_speed_call(lv_event_t *e);
+    void onRecord(bool longPress);
+    void set_text_statusBar(char *str);
+    void rec_btn_style_set(lv_color_t bg_color, lv_color_t img_color, const void *img, lv_style_selector_t PART);
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

@@ -13,6 +13,7 @@ void rec_init()
     recorder.file_p = NULL;
     recorder.active = false;
     recorder.recInfo.time = 0;
+    recorder.recInfo.avg_speed = 0;
     recorder.recInfo.cmd = RECORDER_CMD_NONE;
 }
 void Recorder_FileWriteString(FILE *file_p, const char *str)
@@ -27,8 +28,16 @@ void rec_start(gps_t *gps_gpx)
 
     char filepath[50];
     memset(filepath, 0, sizeof(filepath));
-    snprintf(filepath, sizeof(filepath), FILE_PATH_FORMAT, gps_gpx->date.month, gps_gpx->date.day,
-             gps_gpx->tim.hour + TIME_ZONE, gps_gpx->tim.minute);
+    if (gps_gpx->date.month <= 12)
+    {
+        snprintf(filepath, sizeof(filepath), FILE_PATH_FORMAT, gps_gpx->date.month, gps_gpx->date.day,
+                 gps_gpx->tim.hour + TIME_ZONE, gps_gpx->tim.minute);
+    }
+    else
+    {
+        lv_event_send(ui_statusBtn, LV_EVENT_KEY, 0);
+        return;
+    }
 
     ESP_LOGI(TAG, "filepath = %s, len(filepath) = %d", filepath, strlen(filepath));
 
@@ -37,6 +46,7 @@ void rec_start(gps_t *gps_gpx)
     if (file_p == NULL)
     {
         ESP_LOGE(TAG, "Failed to open file for writing");
+        lv_event_send(ui_statusBtn, LV_EVENT_KEY, 0);
         return;
     }
     recorder.file_p = file_p;
@@ -60,6 +70,7 @@ void rec_point(gps_t *gps_gpx)
     if (recorder.active != true || recorder.file_p == NULL)
     {
         ESP_LOGE(TAG, "rec_point active error!");
+        lv_event_send(ui_statusBtn, LV_EVENT_KEY, 0);
         return;
     }
     ESP_LOGI(TAG, "Track recording...");
@@ -88,6 +99,7 @@ void rec_stop()
     if (recorder.file_p == NULL)
     {
         ESP_LOGE(TAG, "rec_stop file_p == NULL");
+        lv_event_send(ui_statusBtn, LV_EVENT_KEY, 0);
         return;
     }
     ESP_LOGI(TAG, "Track record end");
@@ -107,11 +119,13 @@ void rec_event_handle(void *data)
     switch (recorder.recInfo.cmd)
     {
     case RECORDER_CMD_NONE:
-        ESP_LOGI(TAG, "recorder.active = %d", recorder.active);
+        ESP_LOGD(TAG, "recorder.active = %d", recorder.active);
         break;
     case RECORDER_CMD_START:
         if (recorder.active == false)
+        {
             rec_start(gps_data);
+        }
         else if (recorder.active == true)
             rec_point(gps_data);
         break;

@@ -36,7 +36,13 @@
         "future": "c",
         "system_error": "c",
         "xlocale": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "gpx_timer.h": "c",
+        "rec_timer.h": "c",
+        "timers.h": "c",
+        "stdio.h": "c",
+        "atomic": "c",
+        "cstdint": "c"
     },
     "idf.flashType": "UART",
     "idf.portWin": "COM3",
