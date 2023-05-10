@@ -35,6 +35,7 @@ extern "C"
     extern lv_obj_t *ui_tripData;
     extern lv_obj_t *ui_statusBar;
     extern lv_obj_t *ui_btns;
+    extern void ui_event_mapBtn(lv_event_t *e);
     extern lv_obj_t *ui_mapBtn;
     void ui_event_statusBtn(lv_event_t *e);
     extern lv_obj_t *ui_statusBtn;
@@ -50,6 +51,9 @@ extern "C"
     extern lv_obj_t *ui_latData;
     extern lv_obj_t *ui_altitude;
     extern lv_obj_t *ui_altData;
+    void ui_event_mapScr(lv_event_t *e);
+    extern lv_obj_t *ui_mapScr;
+    extern lv_obj_t *ui_history;
     void ui_event____initial_actions0(lv_event_t *e);
     extern lv_obj_t *ui____initial_actions0;
 
