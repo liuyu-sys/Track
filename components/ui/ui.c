@@ -159,7 +159,7 @@ void ui_event_statusBtn(lv_event_t *e)
         recState = 0;
         set_text_statusBar("error");
         rec_btn_style_set(lv_color_hex(0x2C2C2C), lv_color_hex(0xFBA414), &ui_img_m_start_png, LV_PART_MAIN);
-        recorder.recInfo.cmd = RECORDER_CMD_STOP;
+        rec_init();
         xTimerStop(rec_timer, 0);
     }
 }

@@ -31,6 +31,7 @@ void rec_start(gps_t *gps_gpx)
     memset(filepath, 0, sizeof(filepath));
     if (gps_gpx->date.month > 12)
     {
+        ESP_LOGE(TAG, "time error !!");
         lv_event_send(ui_statusBtn, LV_EVENT_KEY, 0);
         return;
     }
@@ -94,7 +95,6 @@ void rec_point(gps_t *gps_gpx)
 
 void rec_stop()
 {
-
     if (recorder.file_p == NULL)
     {
         ESP_LOGE(TAG, "rec_stop file_p == NULL");

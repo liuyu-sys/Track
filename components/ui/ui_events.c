@@ -14,10 +14,9 @@ uint8_t recState = 0;
 
 void now_speed_call(lv_event_t *e)
 {
-    // Your code here
     gps_t *gps = (gps_t *)lv_event_get_param(e);
     char str[STRLEN];
-    // Your code here
+
     if (gps != NULL)
     {
         snprintf(str, 5, "%02d", (uint8_t)gps->speed);
@@ -94,13 +93,11 @@ void ui_rec_update(lv_event_t *e)
 }
 void onRecord(bool longPress)
 {
-
     switch (recState)
     {
     case 0: // 准备
         if (!longPress)
         {
-            // rec_start();
             recState = 1;
             set_text_statusBar("REC");
             rec_btn_style_set(lv_color_hex(0xFBA414), lv_color_hex(0x2C2C2C), &ui_img_m_stop_png, LV_PART_MAIN);
@@ -138,7 +135,6 @@ void onRecord(bool longPress)
             xTimerStop(rec_timer, 0);
         }
         break;
-
     default:
         break;
     }
