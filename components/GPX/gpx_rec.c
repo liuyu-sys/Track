@@ -12,6 +12,7 @@ void rec_init()
 {
     recorder.file_p = NULL;
     recorder.active = false;
+    recorder.fileName = NULL;
     recorder.recInfo.time = 0;
     recorder.recInfo.avg_speed = 0;
     recorder.recInfo.cmd = RECORDER_CMD_NONE;
@@ -28,17 +29,15 @@ void rec_start(gps_t *gps_gpx)
 
     char filepath[50];
     memset(filepath, 0, sizeof(filepath));
-    if (gps_gpx->date.month <= 12)
-    {
-        snprintf(filepath, sizeof(filepath), FILE_PATH_FORMAT, gps_gpx->date.month, gps_gpx->date.day,
-                 gps_gpx->tim.hour + TIME_ZONE, gps_gpx->tim.minute);
-    }
-    else
+    if (gps_gpx->date.month > 12)
     {
         lv_event_send(ui_statusBtn, LV_EVENT_KEY, 0);
         return;
     }
+    snprintf(filepath, sizeof(filepath), FILE_PATH_FORMAT, gps_gpx->date.month, gps_gpx->date.day,
+             gps_gpx->tim.hour + TIME_ZONE, gps_gpx->tim.minute);
 
+    recorder.fileName = filepath;
     ESP_LOGI(TAG, "filepath = %s, len(filepath) = %d", filepath, strlen(filepath));
 
     FILE *file_p = fopen(filepath, "w+");

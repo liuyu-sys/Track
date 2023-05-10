@@ -30,6 +30,7 @@ typedef struct
 {
     Recorder_Info_t recInfo;
     FILE *file_p;
+    char *fileName;
     bool active;
 } Recorder_t;
 

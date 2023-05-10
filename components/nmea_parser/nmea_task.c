@@ -11,6 +11,14 @@
 
 static const char *TAG = "gps_nmea";
 
+uint8_t hour_check(uint8_t hour)
+{
+    if (hour == 24)
+        return 0;
+    else
+        return hour;
+}
+
 /**
  * @brief GPS Event Handler
  *
@@ -37,6 +45,7 @@ void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int
                  gps->date.year + YEAR_BASE, gps->date.month, gps->date.day,
                  gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second,
                  gps->latitude, gps->longitude, gps->altitude, gps->speed);
+        gps->tim.hour = hour_check(gps->tim.hour);
         // gps->speed = speed_data[cnt++];
         // if (cnt == 11)
         // {
