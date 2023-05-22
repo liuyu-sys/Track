@@ -14,6 +14,8 @@ void rec_timer_callback(TimerHandle_t xTimer)
 void rec_timer_init()
 {
     rec_init();
+    static const char *TAG = "rec_timer_init";
+    ESP_LOGI(TAG, "rec_timer_init");
     const TickType_t timer_interval = 1000 / portTICK_PERIOD_MS; // 定时器中断时间为 1 秒钟
     rec_timer = xTimerCreate("Timer", timer_interval, pdTRUE, NULL, rec_timer_callback);
 }

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "GPX.h"
 
-#define _GPX_HEAD "<gpx version=\"1.1\" creator=\"Arduino GPX Lib\"\n xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n xmlns=\"http://www.topografix.com/GPX/1/1\"\n xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"\n>\n"
+#define _GPX_HEAD "<gpx version=\"1.1\" creator=\"GPX Lib\"\n xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n xmlns=\"http://www.topografix.com/GPX/1/1\"\n xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1\"\n>\n"
 #define _GPX_TAIL "</gpx>\n"
 #define _GPX_META_HEAD "<metadata>"
 #define _GPX_META_TAIL "</metadata>\n"

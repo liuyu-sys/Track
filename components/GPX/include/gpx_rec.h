@@ -9,6 +9,14 @@
 #include "lvgl/lvgl.h"
 #include "ui.h"
 #include "cJSON.h"
+#include "sdmmc_cmd.h"
+#include "dirent.h"
+#include "main.h"
+
+#define RECORDER_GPX_TIME_FMT "%d-%02d-%02dT%02d:%02d:%02dZ"
+#define FILE_PATH "/sdcard/track"
+#define RECORDER_GPX_META_NAME "Track 1.0"
+#define RECORDER_GPX_META_DESC "https://github.com/liuyu-sys"
 
 typedef enum
 {
@@ -35,7 +43,9 @@ typedef struct
 } Recorder_t;
 
 extern Recorder_t recorder;
-
+char *get_gpx_fileName();
+char **get_gpx_files(const char *directory, int *num_files);
+void createDirectoryIfNotExists(const char *path);
 void rec_init();
 void rec_point(gps_t *gps_gpx);
 void rec_start(gps_t *gps_gpx);
