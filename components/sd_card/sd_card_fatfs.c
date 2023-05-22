@@ -180,67 +180,40 @@ sdmmc_card_t *sd_card_fatfs_spi_init(void)
     // 用于挂载文件系统的选项。
     // 如果format_if_mount_failed设置为true，当SD卡挂载失败时，SD卡将被分区并格式化。
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-#ifdef CONFIG_EXAMPLE_FORMAT_IF_MOUNT_FAILED
-        .format_if_mount_failed = true,
-#else
         .format_if_mount_failed = false,
-#endif // EXAMPLE_FORMAT_IF_MOUNT_FAILED
         .max_files = 5,
         .allocation_unit_size = 16 * 1024};
     sdmmc_card_t *card;
     const char mount_point[] = MOUNT_POINT;
     ESP_LOGI(TAG, "Initializing SD card");
-
     ESP_LOGI(TAG, "Using SPI peripheral");
-
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
-    /*spi_bus_config_t bus_cfg = {
-        .mosi_io_num = PIN_NUM_MOSI,
-        .miso_io_num = PIN_NUM_MISO,
-        .sclk_io_num = PIN_NUM_CLK,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
-        .max_transfer_sz = 4000,
-    };*/
-
     host.slot = VSPI_HOST; // 重新配置SD卡的SPI端口
-
-    // SPI模式下，因 SD卡在SPI模式下最大频率仅为25MHz，故配置的值不能超过此项。而在IDF的配置中，SD-SPI的默认频率为20MHz。
-
-    /*ret = spi_bus_initialize(host.slot, &bus_cfg, SPI_DMA_CHAN);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to initialize bus.");
-        return false;
-    }*/
-
     // 这个初始化没有卡检测信号（CD）和写保护（WP）信号。
     // 如果您的主板有这些信号，请修改slot_config.gpio_cd和slot_config.gpio_wp。
     sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
     slot_config.gpio_cs = PIN_NUM_CS;
     slot_config.host_id = host.slot;
-
     // 使用SPI的方式驱动SD卡，并挂载FATFS文件系统
     ret = esp_vfs_fat_sdspi_mount(mount_point, &host, &slot_config, &mount_config, &card);
-
     if (ret != ESP_OK)
     {
         if (ret == ESP_FAIL)
         {
-            ESP_LOGE(TAG, "Failed to mount filesystem. "
-                          "If you want the card to be formatted, set the EXAMPLE_FORMAT_IF_MOUNT_FAILED menuconfig option.");
+            /* 分区不能被安装， 文件系统格式错误*/
+            ESP_LOGE(TAG, "Failed to mount filesystem. ");
         }
         else
         {
+            /* 初始化失败， 可能是卡没有插入*/
             ESP_LOGE(TAG, "Failed to initialize the card (%s). "
                           "Make sure SD card lines have pull-up resistors in place.",
                      esp_err_to_name(ret));
         }
         return false;
     }
-
     // 卡已初始化，打印其属性
     sdmmc_card_print_info(stdout, card);
-
     return card; // 返回SDMMC卡指针，外部可由此获取卡信息
 }
 

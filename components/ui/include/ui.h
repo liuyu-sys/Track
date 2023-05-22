@@ -51,9 +51,28 @@ extern "C"
     extern lv_obj_t *ui_latData;
     extern lv_obj_t *ui_altitude;
     extern lv_obj_t *ui_altData;
+    extern lv_obj_t *ui_day;
+    extern lv_obj_t *ui_dayData;
+    extern lv_obj_t *ui_sate;
+    extern lv_obj_t *ui_sateData;
+    extern lv_obj_t *ui_view_sate;
+    extern lv_obj_t *ui_view_sateData;
+    extern lv_obj_t *ui_hor_dil;
+    extern lv_obj_t *ui_hor_dilData;
+    extern lv_obj_t *ui_pos_dil;
+    extern lv_obj_t *ui_pos_dilData;
+    extern lv_obj_t *ui_ver_dil;
+    extern lv_obj_t *ui_ver_dilData;
+    extern lv_obj_t *ui_gps_val;
+    extern lv_obj_t *ui_gps_valData;
     void ui_event_mapScr(lv_event_t *e);
     extern lv_obj_t *ui_mapScr;
     extern lv_obj_t *ui_history;
+    extern lv_obj_t *ui_map;
+    extern lv_obj_t *ui_up;
+    extern lv_obj_t *ui_left;
+    extern lv_obj_t *ui_down;
+    extern lv_obj_t *ui_right;
     void ui_event____initial_actions0(lv_event_t *e);
     extern lv_obj_t *ui____initial_actions0;
 
@@ -61,9 +80,9 @@ extern "C"
     LV_IMG_DECLARE(ui_img_m_start_png); // assets\m_start.png
     LV_IMG_DECLARE(ui_img_m_stop_png);  // assets\m_stop.png
     LV_IMG_DECLARE(ui_img_m_menu_png);  // assets\m_menu.png
+    // LV_IMG_DECLARE(ui_img_tile_png);    // assets\tile.png
 
     void ui_init(void);
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

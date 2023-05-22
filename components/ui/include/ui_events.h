@@ -12,7 +12,7 @@ extern "C"
 #endif
 
     extern uint8_t recState;
-
+    void ui_event_file(lv_event_t *e);
     void ui_rec_update(lv_event_t *e);
     void now_speed_call(lv_event_t *e);
     void onRecord(bool longPress);

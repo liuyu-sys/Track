@@ -737,12 +737,12 @@ nmea_parser_handle_t nmea_parser_init(const nmea_parser_config_t *config)
     esp_gps->all_statements &= 0xFE;
     /* Install UART friver */
     uart_config_t uart_config = {
-        .baud_rate = config->uart.baud_rate,
-        .data_bits = config->uart.data_bits,
-        .parity = config->uart.parity,
-        .stop_bits = config->uart.stop_bits,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-        .source_clk = UART_SCLK_APB,
+        .baud_rate = config->uart.baud_rate,   // 波特率9600
+        .data_bits = config->uart.data_bits,   // 数据为8位
+        .parity = config->uart.parity,         // 关闭奇偶校验
+        .stop_bits = config->uart.stop_bits,   // 停止位为1
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE, // 关闭硬件流量控制模式
+        .source_clk = UART_SCLK_APB,           // 串口默认时钟
     };
     if (uart_driver_install(esp_gps->uart_port, CONFIG_NMEA_PARSER_RING_BUFFER_SIZE, 0,
                             config->uart.event_queue_size, &esp_gps->event_queue, 0) != ESP_OK)

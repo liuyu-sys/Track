@@ -41,9 +41,28 @@ lv_obj_t *ui_latitude;
 lv_obj_t *ui_latData;
 lv_obj_t *ui_altitude;
 lv_obj_t *ui_altData;
+lv_obj_t *ui_day;
+lv_obj_t *ui_dayData;
+lv_obj_t *ui_sate;
+lv_obj_t *ui_sateData;
+lv_obj_t *ui_view_sate;
+lv_obj_t *ui_view_sateData;
+lv_obj_t *ui_hor_dil;
+lv_obj_t *ui_hor_dilData;
+lv_obj_t *ui_pos_dil;
+lv_obj_t *ui_pos_dilData;
+lv_obj_t *ui_ver_dil;
+lv_obj_t *ui_ver_dilData;
+lv_obj_t *ui_gps_val;
+lv_obj_t *ui_gps_valData;
 void ui_event_mapScr(lv_event_t *e);
 lv_obj_t *ui_mapScr;
 lv_obj_t *ui_history;
+lv_obj_t *ui_map;
+lv_obj_t *ui_up;
+lv_obj_t *ui_left;
+lv_obj_t *ui_down;
+lv_obj_t *ui_right;
 
 void ui_event____initial_actions0(lv_event_t *e);
 lv_obj_t *ui____initial_actions0;
@@ -137,6 +156,13 @@ void ui_event_mapBtn(lv_event_t *e)
     // lv_obj_t *target = lv_event_get_target(e);
     if (event_code == LV_EVENT_CLICKED)
     {
+        char *files = get_gpx_fileName();
+        printf("%s\n", files);
+        lv_dropdown_set_options(ui_history, files);
+        free(files);
+
+        lv_img_set_bin_src("/sdcard/map_real_gcj02/14/13331/6871.bin");
+
         _ui_screen_change(ui_mapScr, LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);
     }
 }
@@ -187,7 +213,7 @@ void ui_event_sysInfo(lv_event_t *e)
 void ui_event_mapScr(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     if (event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_BOTTOM)
     {
         kmhAnim_Animation(ui_speed, 0);
@@ -381,25 +407,11 @@ void ui_displayScr_screen_init(void)
     lv_obj_set_x(ui_statusBtn, 0);
     lv_obj_set_y(ui_statusBtn, 107);
     lv_obj_set_align(ui_statusBtn, LV_ALIGN_CENTER);
-    // lv_obj_add_flag(ui_statusBtn, LV_OBJ_FLAG_CHECKABLE | LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
-    // lv_obj_clear_flag(ui_statusBtn, LV_OBJ_FLAG_SCROLLABLE); /// Flags
     lv_obj_set_style_bg_color(ui_statusBtn, lv_color_hex(0x2C2C2C), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(ui_statusBtn, 255, LV_PART_MAIN);
     lv_obj_set_style_bg_img_src(ui_statusBtn, &ui_img_m_start_png, LV_PART_MAIN);
     lv_obj_set_style_bg_img_recolor(ui_statusBtn, lv_color_hex(0xFBA414), LV_PART_MAIN);
     lv_obj_set_style_bg_img_recolor_opa(ui_statusBtn, 255, LV_PART_MAIN);
-    // lv_obj_set_style_bg_color(ui_statusBtn, lv_color_hex(0xFBA414), LV_PART_MAIN | LV_STATE_CHECKED);
-    // lv_obj_set_style_bg_opa(ui_statusBtn, 255, LV_PART_MAIN | LV_STATE_CHECKED);
-    // lv_obj_set_style_bg_img_src(ui_statusBtn, &ui_img_m_stop_png, LV_PART_MAIN | LV_STATE_CHECKED);
-    // lv_obj_set_style_bg_img_recolor(ui_statusBtn, lv_color_hex(0x2C2C2C), LV_PART_MAIN | LV_STATE_CHECKED);
-    // lv_obj_set_style_bg_img_recolor_opa(ui_statusBtn, 255, LV_PART_MAIN | LV_STATE_CHECKED);
-    // lv_obj_set_style_bg_color(ui_statusBtn, lv_color_hex(0xFBA414), LV_PART_MAIN | LV_STATE_PRESSED);
-    // lv_obj_set_style_bg_opa(ui_statusBtn, 255, LV_PART_MAIN | LV_STATE_PRESSED);
-    // lv_obj_set_style_bg_img_src(ui_statusBtn, &ui_img_m_stop_png, LV_PART_MAIN | LV_STATE_PRESSED);
-    // lv_obj_set_style_bg_img_recolor(ui_statusBtn, lv_color_hex(0x2C2C2C), LV_PART_MAIN | LV_STATE_PRESSED);
-    // lv_obj_set_style_bg_img_recolor_opa(ui_statusBtn, 255, LV_PART_MAIN | LV_STATE_PRESSED);
-    // lv_obj_set_style_bg_color(ui_statusBtn, lv_color_hex(0xFBA414), LV_PART_MAIN | LV_STATE_CHECKED | LV_STATE_PRESSED);
-    // lv_obj_set_style_bg_opa(ui_statusBtn, 255, LV_PART_MAIN | LV_STATE_CHECKED | LV_STATE_PRESSED);
 
     ui_menuBtn = lv_btn_create(ui_btns);
     lv_obj_set_width(ui_menuBtn, 50);
@@ -453,49 +465,125 @@ void ui_sysInfo_screen_init(void)
     lv_obj_set_style_bg_color(ui_Panel2, lv_color_hex(0x2C2C2C), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_Panel2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_day = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_day, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_day, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_day, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_day, "Day");
+
+    ui_dayData = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_dayData, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_dayData, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_dayData, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_dayData, "0000-00-00");
+
     ui_longitude = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_longitude, LV_SIZE_CONTENT);  /// 1
     lv_obj_set_height(ui_longitude, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_longitude, 25);
-    lv_obj_set_y(ui_longitude, -85);
     lv_obj_set_align(ui_longitude, LV_ALIGN_CENTER);
     lv_label_set_text(ui_longitude, "Longitude");
 
     ui_lonData = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_lonData, LV_SIZE_CONTENT);  /// 1
     lv_obj_set_height(ui_lonData, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_lonData, -63);
-    lv_obj_set_y(ui_lonData, -88);
     lv_obj_set_align(ui_lonData, LV_ALIGN_CENTER);
     lv_label_set_text(ui_lonData, "xxxxxxxx");
 
     ui_latitude = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_latitude, LV_SIZE_CONTENT);  /// 1
     lv_obj_set_height(ui_latitude, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_latitude, 25);
-    lv_obj_set_y(ui_latitude, 26);
     lv_obj_set_align(ui_latitude, LV_ALIGN_CENTER);
     lv_label_set_text(ui_latitude, "Latitude");
 
     ui_latData = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_latData, LV_SIZE_CONTENT);  /// 1
     lv_obj_set_height(ui_latData, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_latData, -48);
-    lv_obj_set_y(ui_latData, -30);
     lv_obj_set_align(ui_latData, LV_ALIGN_CENTER);
     lv_label_set_text(ui_latData, "xxxxxxxx");
 
     ui_altitude = lv_label_create(ui_Panel2);
-    lv_obj_set_width(ui_altitude, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height(ui_altitude, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_width(ui_altitude, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_altitude, LV_SIZE_CONTENT);
     lv_obj_set_align(ui_altitude, LV_ALIGN_CENTER);
     lv_label_set_text(ui_altitude, "Altitude");
 
     ui_altData = lv_label_create(ui_Panel2);
-    lv_obj_set_width(ui_altData, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height(ui_altData, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_width(ui_altData, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_altData, LV_SIZE_CONTENT);
     lv_obj_set_align(ui_altData, LV_ALIGN_CENTER);
     lv_label_set_text(ui_altData, "0m");
+
+    ui_sate = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_sate, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_sate, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_sate, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_sate, "Satellites");
+
+    ui_sateData = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_sateData, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_sateData, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_sateData, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_sateData, "00");
+
+    ui_view_sate = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_view_sate, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_view_sate, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_view_sate, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_view_sate, "Satellites View");
+
+    ui_view_sateData = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_view_sateData, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_view_sateData, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_view_sateData, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_view_sateData, "0");
+
+    ui_hor_dil = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_hor_dil, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_hor_dil, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_hor_dil, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_hor_dil, "Horizontal");
+
+    ui_hor_dilData = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_hor_dilData, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_hor_dilData, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_hor_dilData, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_hor_dilData, "0");
+
+    // ui_pos_dil = lv_label_create(ui_Panel2);
+    // lv_obj_set_width(ui_pos_dil, LV_SIZE_CONTENT);
+    // lv_obj_set_height(ui_pos_dil, LV_SIZE_CONTENT);
+    // lv_obj_set_align(ui_pos_dil, LV_ALIGN_CENTER);
+    // lv_label_set_text(ui_pos_dil, "Position");
+
+    // ui_pos_dilData = lv_label_create(ui_Panel2);
+    // lv_obj_set_width(ui_pos_dilData, LV_SIZE_CONTENT);
+    // lv_obj_set_height(ui_pos_dilData, LV_SIZE_CONTENT);
+    // lv_obj_set_align(ui_pos_dilData, LV_ALIGN_CENTER);
+    // lv_label_set_text(ui_pos_dilData, "0");
+
+    // ui_ver_dil = lv_label_create(ui_Panel2);
+    // lv_obj_set_width(ui_ver_dil, LV_SIZE_CONTENT);
+    // lv_obj_set_height(ui_ver_dil, LV_SIZE_CONTENT);
+    // lv_obj_set_align(ui_ver_dil, LV_ALIGN_CENTER);
+    // lv_label_set_text(ui_ver_dil, "Ver dil");
+
+    // ui_ver_dilData = lv_label_create(ui_Panel2);
+    // lv_obj_set_width(ui_ver_dilData, LV_SIZE_CONTENT);
+    // lv_obj_set_height(ui_ver_dilData, LV_SIZE_CONTENT);
+    // lv_obj_set_align(ui_ver_dilData, LV_ALIGN_CENTER);
+    // lv_label_set_text(ui_ver_dilData, "0");
+
+    ui_gps_val = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_gps_val, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_gps_val, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_gps_val, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_gps_val, "GPS Validity");
+
+    ui_gps_valData = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_gps_valData, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_gps_valData, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_gps_valData, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_gps_valData, "0");
 
     lv_obj_add_event_cb(ui_sysInfo, ui_event_sysInfo, LV_EVENT_ALL, NULL);
 }
@@ -508,10 +596,62 @@ void ui_mapScr_screen_init(void)
     lv_obj_set_width(ui_history, 201);
     lv_obj_set_height(ui_history, LV_SIZE_CONTENT); /// 1
     lv_obj_set_x(ui_history, 0);
-    lv_obj_set_y(ui_history, -120);
+    lv_obj_set_y(ui_history, -130);
     lv_obj_set_align(ui_history, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_history, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
 
+    ui_map = lv_img_create(ui_mapScr);
+    lv_obj_set_width(ui_map, 240);
+    lv_obj_set_height(ui_map, 240);
+    lv_obj_set_x(ui_map, 0);
+    lv_obj_set_y(ui_map, 20);
+    lv_obj_set_align(ui_map, LV_ALIGN_LEFT_MID);
+    lv_obj_add_flag(ui_map, LV_OBJ_FLAG_ADV_HITTEST);  /// Flags
+    lv_obj_clear_flag(ui_map, LV_OBJ_FLAG_SCROLLABLE); /// Flags
+    lv_obj_set_style_border_width(ui_map, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui_map, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_pad(ui_map, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui_map, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_spread(ui_map, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // ui_up = lv_btn_create(ui_mapScr);
+    // lv_obj_set_width(ui_up, 40);
+    // lv_obj_set_height(ui_up, 30);
+    // lv_obj_set_x(ui_up, -25);
+    // lv_obj_set_y(ui_up, 124);
+    // lv_obj_set_align(ui_up, LV_ALIGN_CENTER);
+    // lv_obj_add_flag(ui_up, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+    // lv_obj_clear_flag(ui_up, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
+
+    // ui_left = lv_btn_create(ui_mapScr);
+    // lv_obj_set_width(ui_left, 40);
+    // lv_obj_set_height(ui_left, 30);
+    // lv_obj_set_x(ui_left, -75);
+    // lv_obj_set_y(ui_left, 124);
+    // lv_obj_set_align(ui_left, LV_ALIGN_CENTER);
+    // lv_obj_add_flag(ui_left, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+    // lv_obj_clear_flag(ui_left, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
+
+    // ui_down = lv_btn_create(ui_mapScr);
+    // lv_obj_set_width(ui_down, 40);
+    // lv_obj_set_height(ui_down, 30);
+    // lv_obj_set_x(ui_down, 25);
+    // lv_obj_set_y(ui_down, 124);
+    // lv_obj_set_align(ui_down, LV_ALIGN_CENTER);
+    // lv_obj_add_flag(ui_down, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+    // lv_obj_clear_flag(ui_down, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
+
+    // ui_right = lv_btn_create(ui_mapScr);
+    // lv_obj_set_width(ui_right, 40);
+    // lv_obj_set_height(ui_right, 30);
+    // lv_obj_set_x(ui_right, 75);
+    // lv_obj_set_y(ui_right, 125);
+    // lv_obj_set_align(ui_right, LV_ALIGN_CENTER);
+    // lv_obj_add_flag(ui_right, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+    // lv_obj_clear_flag(ui_right, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
+
+    // lv_obj_add_event_cb(ui_left, ui_event_left, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_history, ui_event_file, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_mapScr, ui_event_mapScr, LV_EVENT_ALL, NULL);
 }
 void ui_init(void)

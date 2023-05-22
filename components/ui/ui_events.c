@@ -7,11 +7,23 @@
 #include "nmea_parser.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "gpx_rec.h"
 
 #define STRLEN 11
 
+static const char *TAG = "ui_event";
 uint8_t recState = 0;
 
+void ui_event_file(lv_event_t *e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_VALUE_CHANGED)
+    {
+        char file[20] = "";
+        lv_dropdown_get_selected_str(ui_history, file, sizeof(file));
+        ESP_LOGI(TAG, "%s", file);
+    }
+}
 void now_speed_call(lv_event_t *e)
 {
     gps_t *gps = (gps_t *)lv_event_get_param(e);
@@ -19,8 +31,8 @@ void now_speed_call(lv_event_t *e)
 
     if (gps != NULL)
     {
-        snprintf(str, 5, "%02d", (uint8_t)gps->speed);
-        lv_label_set_text_fmt(ui_speed, "%s", str);
+        lv_label_set_text_fmt(ui_dayData, "%d-%02d-%02d", gps->date.year + YEAR_BASE, gps->date.month, gps->date.day);
+        lv_label_set_text_fmt(ui_speed, "%02d", (uint8_t)gps->speed);
 
         lv_label_set_text_fmt(ui_comp_get_child(ui_statusBar, UI_COMP_STATUSBAR_LABEL7), "%02d : %02d", gps->tim.hour + TIME_ZONE, gps->tim.minute);
         lv_label_set_text_fmt(ui_comp_get_child(ui_statusBar2, UI_COMP_STATUSBAR_LABEL7), "%02d : %02d", gps->tim.hour + TIME_ZONE, gps->tim.minute);
@@ -33,6 +45,13 @@ void now_speed_call(lv_event_t *e)
 
         snprintf(str, 9, "%.05f", gps->longitude);
         lv_label_set_text_fmt(ui_lonData, "%s°E", str);
+
+        snprintf(str, sizeof(str), "%.03f", gps->dop_h);
+        lv_label_set_text_fmt(ui_hor_dilData, "%s", str);
+
+        lv_label_set_text_fmt(ui_gps_valData, "%d", gps->valid);
+        lv_label_set_text_fmt(ui_sateData, "%d", gps->sats_in_use);
+        lv_label_set_text_fmt(ui_view_sateData, "%d", gps->sats_in_view);
     }
 }
 
@@ -95,7 +114,7 @@ void onRecord(bool longPress)
 {
     switch (recState)
     {
-    case 0: // 准备
+    case 0: // 空闲
         if (!longPress)
         {
             recState = 1;
@@ -105,7 +124,7 @@ void onRecord(bool longPress)
             xTimerReset(rec_timer, 0);
         }
         break;
-    case 1: // REC
+    case 1: // 记录
         if (!longPress)
         {
             recState = 2;
@@ -116,7 +135,7 @@ void onRecord(bool longPress)
             xTimerStop(rec_timer, 0);
         }
         break;
-    case 2: // 停止
+    case 2: // 暂停
         if (!longPress)
         {
             recState = 1;

@@ -19,6 +19,10 @@
 #include "ui.h"
 #include "gpx_rec.h"
 #include "nmea_parser.h"
+#include "mpu6050.h"
+#include "gpx_parse.h"
+
+extern sdmmc_card_t *card;
 
 void create_demo_application(void);
 void gui_task(void *arg);
