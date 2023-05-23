@@ -217,14 +217,14 @@ void rec_event_handle(void *data)
     case RECORDER_CMD_START:
         if (recorder.active == false)
             rec_start(gps_data);
-        else if (recorder.active == true && recorder.recInfo.time % 5 == 0)
+        else if (recorder.active == true && recorder.recInfo.time % 3 == 0)
             rec_point(gps_data);
         break;
     case RECORDER_CMD_PAUSE:
 
         break;
     case RECORDER_CMD_CONTINUE:
-        if (recorder.active == true && recorder.recInfo.time % 5 == 0)
+        if (recorder.active == true && recorder.recInfo.time % 3 == 0)
             rec_point(gps_data);
         break;
     case RECORDER_CMD_STOP:
