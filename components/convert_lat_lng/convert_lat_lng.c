@@ -122,7 +122,7 @@ static double rad(double d)
  * @return 返回的距离，单位m
  * */
 
-static double getDistance2(double lon1, double lat1, double lon2, double lat2)
+static double getDistance(double lon1, double lat1, double lon2, double lat2)
 {
     double radLat1 = rad(lat1);
     double radLat2 = rad(lat2);
