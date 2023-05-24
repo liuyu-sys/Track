@@ -15,5 +15,5 @@
 static void PixelXYToTileXY(unsigned long pixelX, unsigned long pixelY, int screenWidth, int screenHeigh, unsigned long *tileX, unsigned long *tileY,
                             uint8_t *tileSubX, uint8_t *tileSubY, uint8_t *pSubX, uint8_t *pSubY);
 static void LatLongToPixelXY(double latitude, double longitude, int levelOfDetail, unsigned long *pixelX, unsigned long *pixelY);
-
 void wgs84_to_gcj02(double *lng, double *lat);
+static double getDistance2(double lon1, double lat1, double lon2, double lat2);

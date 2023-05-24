@@ -104,6 +104,35 @@ static void PixelXYToTileXY(unsigned long pixelX, unsigned long pixelY, int scre
     *pSubY = pixelY % 256 % screenHeigh;
 }
 
+/* 默认地球半径,赤道半径(单位m) */
+#define EARTH_RADIUS1 6371000
+
+/**
+ * 转化为弧度(rad)
+ */
+static double rad(double d)
+{
+    return (d * M_PI / 180.0);
+}
+/**
+ * @param lon1 第一点的精度
+ * @param lat1 第一点的纬度
+ * @param lon2 第二点的精度
+ * @param lat2 第二点的纬度
+ * @return 返回的距离，单位m
+ * */
+
+static double getDistance2(double lon1, double lat1, double lon2, double lat2)
+{
+    double radLat1 = rad(lat1);
+    double radLat2 = rad(lat2);
+    double a = radLat1 - radLat2;
+    double b = rad(lon1) - rad(lon2);
+    double s = 2 * asin(sqrt(pow(sin(a / 2), 2) + cos(radLat1) * cos(radLat2) * pow(sin(b / 2), 2)));
+    s = s * EARTH_RADIUS1;
+    s = round(s * 10000) / 10000;
+    return s;
+}
 int TEST_main(int argc)
 {
     double longitude = 112.924530; // 经度 27.850729" lon="112.916763
