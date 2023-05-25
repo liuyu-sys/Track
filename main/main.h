@@ -21,6 +21,7 @@
 #include "nmea_parser.h"
 #include "mpu6050.h"
 #include "gpx_parse.h"
+#include "convert_lat_lng.h"
 
 extern sdmmc_card_t *card;
 

@@ -65,7 +65,8 @@
         "new": "c",
         "gpx_parse.h": "c",
         "dirent.h": "c",
-        "ui_helpers.h": "c"
+        "ui_helpers.h": "c",
+        "cmath": "c"
     },
     "idf.flashType": "UART",
     "idf.portWin": "COM3",

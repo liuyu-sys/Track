@@ -8,11 +8,60 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gpx_rec.h"
+#include "convert_lat_lng.h"
 
 #define STRLEN 11
 
 static const char *TAG = "ui_event";
 uint8_t recState = 0;
+float last_lng = 0;
+float last_lat = 0;
+uint32_t last_time = 0;
+double Total_trip = 0;
+
+uint32_t
+get_time(gps_t *gps)
+{
+    long totalSeconds = gps->tim.hour * 3600 + gps->tim.minute * 60 + gps->tim.second;
+    long totalDays = gps->date.day;
+    return (totalSeconds + (totalDays * 24 * 3600));
+}
+
+float getSpeed(gps_t *gps)
+{
+    if (gps->valid == false)
+    {
+        return 0;
+    }
+    if (last_lng == 0 || last_lat == 0)
+    {
+        last_lng = gps->longitude;
+        last_lat = gps->latitude;
+        last_time = get_time(gps);
+        return 0;
+    }
+    float lng = gps->longitude;
+    float lat = gps->latitude;
+    double distance = getDistance(lng, lat, last_lng, last_lat);
+    last_lng = lng;
+    last_lat = lat;
+    uint32_t now_time = get_time(gps);
+    float speedKmh = (distance / (now_time - last_time)) * 3.6;
+    last_time = now_time;
+
+    if (gps->speed > 3)
+    {
+        if (recorder.active == true)
+        {
+            Total_trip += distance;
+        }
+        return speedKmh;
+    }
+    else
+    {
+        return gps->speed;
+    }
+}
 
 void ui_event_file(lv_event_t *e)
 {
@@ -32,7 +81,7 @@ void now_speed_call(lv_event_t *e)
     if (gps != NULL)
     {
         lv_label_set_text_fmt(ui_dayData, "%d-%02d-%02d", gps->date.year + YEAR_BASE, gps->date.month, gps->date.day);
-        lv_label_set_text_fmt(ui_speed, "%02d", (uint8_t)gps->speed);
+        lv_label_set_text_fmt(ui_speed, "%02d", (uint8_t)getSpeed(gps));
 
         lv_label_set_text_fmt(ui_comp_get_child(ui_statusBar, UI_COMP_STATUSBAR_LABEL7), "%02d : %02d", gps->tim.hour + TIME_ZONE, gps->tim.minute);
         lv_label_set_text_fmt(ui_comp_get_child(ui_statusBar2, UI_COMP_STATUSBAR_LABEL7), "%02d : %02d", gps->tim.hour + TIME_ZONE, gps->tim.minute);
@@ -40,7 +89,7 @@ void now_speed_call(lv_event_t *e)
         snprintf(str, 9, "%.05f", gps->latitude);
         lv_label_set_text_fmt(ui_latData, "%s°N", str);
 
-        snprintf(str, 5, "%.02f", gps->altitude);
+        snprintf(str, 5, "%d", (int)gps->altitude);
         lv_label_set_text_fmt(ui_altData, "%sm", str);
 
         snprintf(str, 9, "%.05f", gps->longitude);
@@ -50,8 +99,7 @@ void now_speed_call(lv_event_t *e)
         lv_label_set_text_fmt(ui_hor_dilData, "%s", str);
 
         lv_label_set_text_fmt(ui_gps_valData, "%d", gps->valid);
-        lv_label_set_text_fmt(ui_sateData, "%d", gps->sats_in_use);
-        lv_label_set_text_fmt(ui_view_sateData, "%d", gps->sats_in_view);
+        lv_label_set_text_fmt(ui_sateData, "%d / %d", gps->sats_in_use, gps->sats_in_view);
     }
 }
 
@@ -76,10 +124,11 @@ void ui_rec_update(lv_event_t *e)
     static float last_speed = 0;
     char str[20];
     int hour, min, sec;
-    int trip = 0;
+    double trip = 0;
     if (LV_EVENT_VALUE_CHANGED == event_code)
     {
         last_speed = (float)atoi(lv_label_get_text(ui_speed));
+
         last_speed = (Info.avg_speed * (Info.time - 1) + last_speed) / Info.time;
         recorder.recInfo.avg_speed = last_speed;
         snprintf(str, sizeof(str), "%.01f", Info.avg_speed);
@@ -98,14 +147,14 @@ void ui_rec_update(lv_event_t *e)
         }
         lv_label_set_text_fmt(ui_timeData, "%s", str);
 
-        trip = last_speed * 0.2778 * Info.time; // 计算路程
+        trip = Total_trip; // 计算路程
         if (trip > 1000)
         {
-            snprintf(str, sizeof(str), "%.02f km", (float)trip / 1000);
+            snprintf(str, sizeof(str), "%.02f km", trip / 1000);
         }
         else
         {
-            snprintf(str, sizeof(str), "%d m", trip);
+            snprintf(str, sizeof(str), "%d m", (int)trip);
         }
         lv_label_set_text_fmt(ui_tripData, "%s", str);
     }

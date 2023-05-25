@@ -99,8 +99,9 @@ void sd_task(void *arg)
     while (true)
     {
         // i2c_mpu6050_get_accel_gyro(I2C_NUM_0, accel, gyro);
-        // printf("Accel: x:%d\ty:%d\tz:%d\t||\tGyro: x:%d\ty:%d\tz:%d, x+y+z = %d\n", accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2], (gyro[0] + gyro[1] + gyro[2]));
+        // printf("Accel: x:%d\ty:%d\tz:%d\t, (x+y+z)/3 = %d ||\tGyro: x:%d\ty:%d\tz:%d\n", accel[0], accel[1], accel[2], (accel[0] + accel[1] + accel[2]) / 3, gyro[0], gyro[1], gyro[2]);
 
+        // printf("Accel variance: %.2f, gyro variance: %.2f\n\n", calculateVariance(accel, 3), calculateVariance(gyro, 3));
         // UBaseType_t stackHigh_gui = uxTaskGetStackHighWaterMark(gui_task_hand);
         // UBaseType_t stackHigh_sd = uxTaskGetStackHighWaterMark(sd_card_task_hand);
         // printf("stackHigh_gui = %u, stackHigh_sd = %u\n", stackHigh_gui * sizeof(StackType_t), stackHigh_sd * sizeof(StackType_t));

@@ -12,8 +12,10 @@
 #define A (6378245.0)               // #长半轴
 #define EE (0.00669342162296594323) // #偏心率平方
 
-static void PixelXYToTileXY(unsigned long pixelX, unsigned long pixelY, int screenWidth, int screenHeigh, unsigned long *tileX, unsigned long *tileY,
-                            uint8_t *tileSubX, uint8_t *tileSubY, uint8_t *pSubX, uint8_t *pSubY);
-static void LatLongToPixelXY(double latitude, double longitude, int levelOfDetail, unsigned long *pixelX, unsigned long *pixelY);
+void PixelXYToTileXY(unsigned long pixelX, unsigned long pixelY, int screenWidth, int screenHeigh, unsigned long *tileX, unsigned long *tileY,
+                     uint8_t *tileSubX, uint8_t *tileSubY, uint8_t *pSubX, uint8_t *pSubY);
+void LatLongToPixelXY(double latitude, double longitude, int levelOfDetail, unsigned long *pixelX, unsigned long *pixelY);
 void wgs84_to_gcj02(double *lng, double *lat);
-static double getDistance(double lon1, double lat1, double lon2, double lat2);
+double getDistance(double lon1, double lat1, double lon2, double lat2);
+double calculateMean(int16_t data[], int n);
+double calculateVariance(int16_t data[], int n);

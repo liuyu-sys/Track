@@ -45,14 +45,8 @@ lv_obj_t *ui_day;
 lv_obj_t *ui_dayData;
 lv_obj_t *ui_sate;
 lv_obj_t *ui_sateData;
-lv_obj_t *ui_view_sate;
-lv_obj_t *ui_view_sateData;
 lv_obj_t *ui_hor_dil;
 lv_obj_t *ui_hor_dilData;
-lv_obj_t *ui_pos_dil;
-lv_obj_t *ui_pos_dilData;
-lv_obj_t *ui_ver_dil;
-lv_obj_t *ui_ver_dilData;
 lv_obj_t *ui_gps_val;
 lv_obj_t *ui_gps_valData;
 void ui_event_mapScr(lv_event_t *e);
@@ -517,25 +511,13 @@ void ui_sysInfo_screen_init(void)
     lv_obj_set_width(ui_sate, LV_SIZE_CONTENT);
     lv_obj_set_height(ui_sate, LV_SIZE_CONTENT);
     lv_obj_set_align(ui_sate, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_sate, "Satellites");
+    lv_label_set_text(ui_sate, "Satellites U / V");
 
     ui_sateData = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_sateData, LV_SIZE_CONTENT);
     lv_obj_set_height(ui_sateData, LV_SIZE_CONTENT);
     lv_obj_set_align(ui_sateData, LV_ALIGN_CENTER);
     lv_label_set_text(ui_sateData, "00");
-
-    ui_view_sate = lv_label_create(ui_Panel2);
-    lv_obj_set_width(ui_view_sate, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_view_sate, LV_SIZE_CONTENT);
-    lv_obj_set_align(ui_view_sate, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_view_sate, "Satellites View");
-
-    ui_view_sateData = lv_label_create(ui_Panel2);
-    lv_obj_set_width(ui_view_sateData, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_view_sateData, LV_SIZE_CONTENT);
-    lv_obj_set_align(ui_view_sateData, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_view_sateData, "0");
 
     ui_hor_dil = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_hor_dil, LV_SIZE_CONTENT);
@@ -548,30 +530,6 @@ void ui_sysInfo_screen_init(void)
     lv_obj_set_height(ui_hor_dilData, LV_SIZE_CONTENT);
     lv_obj_set_align(ui_hor_dilData, LV_ALIGN_CENTER);
     lv_label_set_text(ui_hor_dilData, "0");
-
-    // ui_pos_dil = lv_label_create(ui_Panel2);
-    // lv_obj_set_width(ui_pos_dil, LV_SIZE_CONTENT);
-    // lv_obj_set_height(ui_pos_dil, LV_SIZE_CONTENT);
-    // lv_obj_set_align(ui_pos_dil, LV_ALIGN_CENTER);
-    // lv_label_set_text(ui_pos_dil, "Position");
-
-    // ui_pos_dilData = lv_label_create(ui_Panel2);
-    // lv_obj_set_width(ui_pos_dilData, LV_SIZE_CONTENT);
-    // lv_obj_set_height(ui_pos_dilData, LV_SIZE_CONTENT);
-    // lv_obj_set_align(ui_pos_dilData, LV_ALIGN_CENTER);
-    // lv_label_set_text(ui_pos_dilData, "0");
-
-    // ui_ver_dil = lv_label_create(ui_Panel2);
-    // lv_obj_set_width(ui_ver_dil, LV_SIZE_CONTENT);
-    // lv_obj_set_height(ui_ver_dil, LV_SIZE_CONTENT);
-    // lv_obj_set_align(ui_ver_dil, LV_ALIGN_CENTER);
-    // lv_label_set_text(ui_ver_dil, "Ver dil");
-
-    // ui_ver_dilData = lv_label_create(ui_Panel2);
-    // lv_obj_set_width(ui_ver_dilData, LV_SIZE_CONTENT);
-    // lv_obj_set_height(ui_ver_dilData, LV_SIZE_CONTENT);
-    // lv_obj_set_align(ui_ver_dilData, LV_ALIGN_CENTER);
-    // lv_label_set_text(ui_ver_dilData, "0");
 
     ui_gps_val = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_gps_val, LV_SIZE_CONTENT);

@@ -35,15 +35,15 @@ void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int
     case GPS_UPDATE:
         gps = (gps_t *)event_data;
         /* print information parsed from GPS statements */
-        // ESP_LOGD(TAG, "%d/%d/%d %d:%d:%d => \r\n"
-        //               "\t\t\t\t\t\tlatitude   = %.05f°N\r\n"
-        //               "\t\t\t\t\t\tlongitude = %.05f°E\r\n"
-        //               "\t\t\t\t\t\taltitude   = %.02fm\r\n"
-        //               "\t\t\t\t\t\tspeed      = %fm/s"
-        //               "\t\t\t\t\t\tdop_h = %.03f , dop_p = %.03f, dop_v = %.03f\r\n",
-        //          gps->date.year + YEAR_BASE, gps->date.month, gps->date.day,
-        //          gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second,
-        //          gps->latitude, gps->longitude, gps->altitude, gps->speed, gps->dop_h, gps->dop_p, gps->dop_v);
+        ESP_LOGD(TAG, "%d/%d/%d %d:%d:%d => \r\n"
+                      "latitude   = %.05f°N\r\n"
+                      "longitude = %.05f°E\r\n"
+                      "altitude   = %.02fm\r\n"
+                      "speed      = %fm/s\r\n"
+                      "dop_h = %.03f , dop_p = %.03f, dop_v = %.03f\r\n",
+                 gps->date.year + YEAR_BASE, gps->date.month, gps->date.day,
+                 gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second,
+                 gps->latitude, gps->longitude, gps->altitude, gps->speed, gps->dop_h, gps->dop_p, gps->dop_v);
 
         gps->tim.hour = hour_check(gps->tim.hour);
 

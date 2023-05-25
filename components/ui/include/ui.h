@@ -55,14 +55,8 @@ extern "C"
     extern lv_obj_t *ui_dayData;
     extern lv_obj_t *ui_sate;
     extern lv_obj_t *ui_sateData;
-    extern lv_obj_t *ui_view_sate;
-    extern lv_obj_t *ui_view_sateData;
     extern lv_obj_t *ui_hor_dil;
     extern lv_obj_t *ui_hor_dilData;
-    extern lv_obj_t *ui_pos_dil;
-    extern lv_obj_t *ui_pos_dilData;
-    extern lv_obj_t *ui_ver_dil;
-    extern lv_obj_t *ui_ver_dilData;
     extern lv_obj_t *ui_gps_val;
     extern lv_obj_t *ui_gps_valData;
     void ui_event_mapScr(lv_event_t *e);

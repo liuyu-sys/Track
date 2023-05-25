@@ -79,8 +79,7 @@ void wgs84_to_gcj02(double *lng, double *lat)
     *lat = *lat + dlat;
     *lng = *lng + dlng;
 }
-
-static void LatLongToPixelXY(double latitude, double longitude, int levelOfDetail, unsigned long *pixelX, unsigned long *pixelY)
+void LatLongToPixelXY(double latitude, double longitude, int levelOfDetail, unsigned long *pixelX, unsigned long *pixelY)
 {
     latitude = Clip(latitude, MinLatitude, MaxLatitude);
     longitude = Clip(longitude, MinLongitude, MaxLongitude);
@@ -93,8 +92,8 @@ static void LatLongToPixelXY(double latitude, double longitude, int levelOfDetai
     *pixelX = ClipULONG(x * mapSize + 0.5, 0, mapSize - 1);
     *pixelY = ClipULONG(y * mapSize + 0.5, 0, mapSize - 1);
 }
-static void PixelXYToTileXY(unsigned long pixelX, unsigned long pixelY, int screenWidth, int screenHeigh, unsigned long *tileX, unsigned long *tileY,
-                            uint8_t *tileSubX, uint8_t *tileSubY, uint8_t *pSubX, uint8_t *pSubY)
+void PixelXYToTileXY(unsigned long pixelX, unsigned long pixelY, int screenWidth, int screenHeigh, unsigned long *tileX, unsigned long *tileY,
+                     uint8_t *tileSubX, uint8_t *tileSubY, uint8_t *pSubX, uint8_t *pSubY)
 {
     *tileX = pixelX / 256;
     *tileY = pixelY / 256;
@@ -122,7 +121,7 @@ static double rad(double d)
  * @return 返回的距离，单位m
  * */
 
-static double getDistance(double lon1, double lat1, double lon2, double lat2)
+double getDistance(double lon1, double lat1, double lon2, double lat2)
 {
     double radLat1 = rad(lat1);
     double radLat2 = rad(lat2);
@@ -133,6 +132,31 @@ static double getDistance(double lon1, double lat1, double lon2, double lat2)
     s = round(s * 10000) / 10000;
     return s;
 }
+
+double calculateMean(int16_t data[], int n)
+{
+    double sum = 0.0;
+    for (int i = 0; i < n; i++)
+    {
+        sum += data[i];
+    }
+    return (sum / n);
+}
+
+double calculateVariance(int16_t data[], int n)
+{
+    double mean = calculateMean(data, n);
+    double sumOfSquaredDiff = 0.0;
+
+    for (int i = 0; i < n; i++)
+    {
+        double diff = data[i] - mean;
+        sumOfSquaredDiff += diff * diff;
+    }
+
+    return (sumOfSquaredDiff / n);
+}
+
 int TEST_main(int argc)
 {
     double longitude = 112.924530; // 经度 27.850729" lon="112.916763
