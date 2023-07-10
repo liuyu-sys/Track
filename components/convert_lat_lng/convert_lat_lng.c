@@ -37,37 +37,32 @@ static unsigned long ClipULONG(unsigned long n, unsigned long minValue, unsigned
     return CONSTRAIN(n, minValue, maxValue);
 }
 
-static int ClipLevel(uint8_t n)
-{
-    return CONSTRAIN(n, MinLevel, MaxLevel);
-}
-
 static unsigned long MapSize(int levelOfDetail)
 {
     unsigned long seed = 256;
     return seed << levelOfDetail;
 }
 
-double transformlng(double lng, double lat)
+float transformlng(float lng, float lat)
 {
-    double ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * sqrt(fabs(lng));
+    float ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * sqrt(fabs(lng));
     ret += (20.0 * sin(6.0 * lng * M_PI) + 20.0 * sin(2.0 * lng * M_PI)) * 2.0 / 3.0;
     ret += (20.0 * sin(lng * M_PI) + 40.0 * sin(lng / 3.0 * M_PI)) * 2.0 / 3.0;
     ret += (150.0 * sin(lng / 12.0 * M_PI) + 300.0 * sin(lng / 30.0 * M_PI)) * 2.0 / 3.0;
     return ret;
 }
 
-double transformlat(double lng, double lat)
+float transformlat(float lng, float lat)
 {
-    double ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * sqrt(fabs(lng));
+    float ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * sqrt(fabs(lng));
     ret += (20.0 * sin(6.0 * lng * M_PI) + 20.0 * sin(2.0 * lng * M_PI)) * 2.0 / 3.0;
     ret += (20.0 * sin(lat * M_PI) + 40.0 * sin(lat / 3.0 * M_PI)) * 2.0 / 3.0;
     ret += (160.0 * sin(lat / 12.0 * M_PI) + 320.0 * sin(lat * M_PI / 30.0)) * 2.0 / 3.0;
     return ret;
 }
-void wgs84_to_gcj02(double *lng, double *lat)
+void wgs84_to_gcj02(float *lng, float *lat)
 {
-    double dlat, dlng, magic, sqrtmagic, radlat;
+    float dlat, dlng, magic, sqrtmagic, radlat;
     dlat = transformlat(*lng - 105.0, *lat - 35.0);
     dlng = transformlng(*lng - 105.0, *lat - 35.0);
     radlat = *lat / 180.0 * M_PI;
@@ -79,20 +74,21 @@ void wgs84_to_gcj02(double *lng, double *lat)
     *lat = *lat + dlat;
     *lng = *lng + dlng;
 }
-void LatLongToPixelXY(double latitude, double longitude, int levelOfDetail, unsigned long *pixelX, unsigned long *pixelY)
+void LatLongToPixelXY(float latitude, float longitude, uint8_t levelOfDetail, uint32_t *pixelX, uint32_t *pixelY)
 {
-    latitude = Clip(latitude, MinLatitude, MaxLatitude);
+    /* 限制经纬度范围 */
+    latitude = Clip(latitude, MinLatitude, MaxLatitude);  
     longitude = Clip(longitude, MinLongitude, MaxLongitude);
 
-    double x = (longitude + 180.0) / 360.0;
-    double sinLatitude = sin(latitude * M_PI / 180.0);
-    double y = 0.5 - log((1.0 + sinLatitude) / (1.0 - sinLatitude)) / (4.0 * M_PI);
+    float x = (longitude + 180.0) / 360.0;
+    float sinLatitude = sin(latitude * M_PI / 180.0);
+    float y = 0.5 - log((1.0 + sinLatitude) / (1.0 - sinLatitude)) / (4.0 * M_PI);
 
-    unsigned long mapSize = MapSize(levelOfDetail);
+    uint32_t mapSize = MapSize(levelOfDetail);
     *pixelX = ClipULONG(x * mapSize + 0.5, 0, mapSize - 1);
     *pixelY = ClipULONG(y * mapSize + 0.5, 0, mapSize - 1);
 }
-void PixelXYToTileXY(unsigned long pixelX, unsigned long pixelY, int screenWidth, int screenHeigh, unsigned long *tileX, unsigned long *tileY,
+void PixelXYToTileXY(uint32_t pixelX, uint32_t pixelY, int screenWidth, int screenHeigh, uint32_t *tileX, uint32_t *tileY,
                      uint8_t *tileSubX, uint8_t *tileSubY, uint8_t *pSubX, uint8_t *pSubY)
 {
     *tileX = pixelX / 256;
@@ -155,33 +151,4 @@ double calculateVariance(int16_t data[], int n)
     }
 
     return (sumOfSquaredDiff / n);
-}
-
-int TEST_main(int argc)
-{
-    double longitude = 112.924530; // 经度 27.850729" lon="112.916763
-    double latitude = 27.847441;   // 纬度 27.847441" lon="112.924530
-    int zoom = 18;                 // 缩放级别
-    wgs84_to_gcj02(&longitude, &latitude);
-    double tileX_double = calculateTileX(longitude, zoom);
-    double tileY_double = calculateTileY(latitude, zoom);
-    printf("tileX_double = %d, tileY_double = %d\n", (int)tileX_double, (int)tileY_double);
-    unsigned long tileX, tileY;
-
-    unsigned long PixelX, PixelY;
-    LatLongToPixelXY(latitude, longitude, zoom, &PixelX, &PixelY);
-
-    uint8_t tileSubX, tileSubY;
-
-    PixelXYToTileXY(PixelX, PixelY, 256, 256, &tileX, &tileY, &tileSubX, &tileSubY, &pixelSubX, &pixelSubY);
-    printf("path: D:\\lvgl_study\\map\\%d\\%ld\\%ld\n", zoom, tileX, tileY);
-
-    printf("Pixel X: %ld\n", PixelX);
-    printf("Pixel Y: %ld\n", PixelY);
-    printf("tileSub X: %d\n", tileSubX);
-    printf("tileSub Y: %d\n", tileSubY);
-    printf("pixelSub X: %d\n", pixelSubX);
-    printf("pixelSub Y: %d\n", pixelSubY);
-
-    return 0;
 }

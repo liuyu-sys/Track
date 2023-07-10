@@ -17,6 +17,9 @@ extern "C"
 #include "ui_comp_hook.h"
 #include "ui_events.h"
 #include "rec_timer.h"
+#include "nmea_task.h"
+#include "ui_helpers.h"
+#include "string.h"
     void kmhAnim_Animation(lv_obj_t *TargetObject, int delay);
     void btnsAnim_Animation(lv_obj_t *TargetObject, int delay);
     extern lv_obj_t *ui_displayScr;
@@ -35,11 +38,9 @@ extern "C"
     extern lv_obj_t *ui_tripData;
     extern lv_obj_t *ui_statusBar;
     extern lv_obj_t *ui_btns;
-    extern void ui_event_mapBtn(lv_event_t *e);
     extern lv_obj_t *ui_mapBtn;
     void ui_event_statusBtn(lv_event_t *e);
     extern lv_obj_t *ui_statusBtn;
-    void ui_event_menuBtn(lv_event_t *e);
     extern lv_obj_t *ui_menuBtn;
     void ui_event_sysInfo(lv_event_t *e);
     extern lv_obj_t *ui_sysInfo;
@@ -69,6 +70,14 @@ extern "C"
     extern lv_obj_t *ui_right;
     void ui_event____initial_actions0(lv_event_t *e);
     extern lv_obj_t *ui____initial_actions0;
+    extern lv_obj_t *ui_mapPoint;
+    extern uint8_t ui_now_scr;
+    enum
+    {
+        UI_DISPLAY_SCR = 0,
+        UI_SYSINFO_SCR = 1,
+        UI_MAP_SCR = 2
+    };
 
     LV_IMG_DECLARE(ui_img_map_png);     // assets\map.png
     LV_IMG_DECLARE(ui_img_m_start_png); // assets\m_start.png

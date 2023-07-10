@@ -25,7 +25,6 @@ lv_obj_t *ui_calData;
 lv_obj_t *ui_tripData;
 lv_obj_t *ui_statusBar;
 lv_obj_t *ui_btns;
-void ui_event_mapBtn(lv_event_t *e);
 lv_obj_t *ui_mapBtn;
 void ui_event_statusBtn(lv_event_t *e);
 lv_obj_t *ui_statusBtn;
@@ -57,9 +56,10 @@ lv_obj_t *ui_up;
 lv_obj_t *ui_left;
 lv_obj_t *ui_down;
 lv_obj_t *ui_right;
-
+lv_obj_t *ui_mapPoint;
 void ui_event____initial_actions0(lv_event_t *e);
 lv_obj_t *ui____initial_actions0;
+uint8_t ui_now_scr;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
@@ -144,22 +144,6 @@ void ui_event_speed(lv_event_t *e)
         now_speed_call(e);
     }
 }
-void ui_event_mapBtn(lv_event_t *e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    // lv_obj_t *target = lv_event_get_target(e);
-    if (event_code == LV_EVENT_CLICKED)
-    {
-        char *files = get_gpx_fileName();
-        printf("%s\n", files);
-        lv_dropdown_set_options(ui_history, files);
-        free(files);
-
-        lv_img_set_bin_src("/sdcard/map_real_gcj02/14/13331/6871.bin");
-
-        _ui_screen_change(ui_mapScr, LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);
-    }
-}
 
 void ui_event_statusBtn(lv_event_t *e)
 {
@@ -190,6 +174,7 @@ void ui_event_menuBtn(lv_event_t *e)
     if (event_code == LV_EVENT_CLICKED)
     {
         _ui_screen_change(ui_sysInfo, LV_SCR_LOAD_ANIM_MOVE_TOP, 300, 0);
+        ui_now_scr = UI_SYSINFO_SCR;
     }
 }
 void ui_event_sysInfo(lv_event_t *e)
@@ -202,6 +187,7 @@ void ui_event_sysInfo(lv_event_t *e)
         kmhAnim_Animation(ui_Dial, 0);
         _ui_state_modify(ui_menuBtn, LV_STATE_CHECKED, _UI_MODIFY_STATE_REMOVE);
         _ui_screen_change(ui_displayScr, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 500, 0);
+        ui_now_scr = UI_DISPLAY_SCR;
     }
 }
 void ui_event_mapScr(lv_event_t *e)
@@ -214,6 +200,7 @@ void ui_event_mapScr(lv_event_t *e)
         btnsAnim_Animation(ui_btns, 0);
         _ui_state_modify(ui_mapBtn, LV_STATE_CHECKED, _UI_MODIFY_STATE_REMOVE);
         _ui_screen_change(ui_displayScr, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
+        ui_now_scr = UI_DISPLAY_SCR;
     }
 }
 void ui_event____initial_actions0(lv_event_t *e)
@@ -535,7 +522,7 @@ void ui_sysInfo_screen_init(void)
     lv_obj_set_width(ui_gps_val, LV_SIZE_CONTENT);
     lv_obj_set_height(ui_gps_val, LV_SIZE_CONTENT);
     lv_obj_set_align(ui_gps_val, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_gps_val, "GPS Validity");
+    lv_label_set_text(ui_gps_val, "Course       ");
 
     ui_gps_valData = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_gps_valData, LV_SIZE_CONTENT);
@@ -550,19 +537,19 @@ void ui_mapScr_screen_init(void)
     ui_mapScr = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_mapScr, LV_OBJ_FLAG_SCROLLABLE); /// Flags
 
-    ui_history = lv_dropdown_create(ui_mapScr);
-    lv_obj_set_width(ui_history, 201);
-    lv_obj_set_height(ui_history, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_history, 0);
-    lv_obj_set_y(ui_history, -130);
-    lv_obj_set_align(ui_history, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_history, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+    // ui_history = lv_dropdown_create(ui_mapScr);
+    // lv_obj_set_width(ui_history, 201);
+    // lv_obj_set_height(ui_history, LV_SIZE_CONTENT); /// 1
+    // lv_obj_set_x(ui_history, 0);
+    // lv_obj_set_y(ui_history, -130);
+    // lv_obj_set_align(ui_history, LV_ALIGN_CENTER);
+    // lv_obj_add_flag(ui_history, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
 
     ui_map = lv_img_create(ui_mapScr);
     lv_obj_set_width(ui_map, 240);
     lv_obj_set_height(ui_map, 240);
     lv_obj_set_x(ui_map, 0);
-    lv_obj_set_y(ui_map, 20);
+    lv_obj_set_y(ui_map, 0);
     lv_obj_set_align(ui_map, LV_ALIGN_LEFT_MID);
     lv_obj_add_flag(ui_map, LV_OBJ_FLAG_ADV_HITTEST);  /// Flags
     lv_obj_clear_flag(ui_map, LV_OBJ_FLAG_SCROLLABLE); /// Flags
@@ -572,6 +559,17 @@ void ui_mapScr_screen_init(void)
     lv_obj_set_style_shadow_width(ui_map, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_spread(ui_map, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_mapPoint = lv_obj_create(ui_map);
+    lv_obj_set_width(ui_mapPoint, 10);
+    lv_obj_set_height(ui_mapPoint, 10);
+    lv_obj_set_align(ui_mapPoint, LV_ALIGN_TOP_LEFT);
+    lv_obj_add_flag(ui_mapPoint, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_style_bg_color(ui_mapPoint, lv_color_hex(0XFBA414), LV_PART_MAIN);
+    lv_obj_set_style_border_width(ui_mapPoint, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui_mapPoint, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_pad(ui_mapPoint, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui_mapPoint, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_spread(ui_mapPoint, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     // ui_up = lv_btn_create(ui_mapScr);
     // lv_obj_set_width(ui_up, 40);
     // lv_obj_set_height(ui_up, 30);
@@ -609,7 +607,7 @@ void ui_mapScr_screen_init(void)
     // lv_obj_clear_flag(ui_right, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
 
     // lv_obj_add_event_cb(ui_left, ui_event_left, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_history, ui_event_file, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(ui_history, ui_event_file, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_mapScr, ui_event_mapScr, LV_EVENT_ALL, NULL);
 }
 void ui_init(void)
@@ -624,6 +622,7 @@ void ui_init(void)
     ui_mapScr_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_obj_add_event_cb(ui____initial_actions0, ui_event____initial_actions0, LV_EVENT_ALL, NULL);
+    ui_now_scr = UI_DISPLAY_SCR;
 
     lv_disp_load_scr(ui____initial_actions0);
     lv_disp_load_scr(ui_displayScr);

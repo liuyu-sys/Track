@@ -12,7 +12,7 @@ char *get_gpx_fileName()
     const char *directory = FILE_PATH; // 替换为实际的目录路径
     int num_files;
     char **filenames = get_gpx_files(directory, &num_files);
-    char *res = (char *)malloc(1024 * sizeof(char));
+    char *res = (char *)malloc(20 * sizeof(char) * num_files);
     if (filenames == NULL)
     {
         printf("No GPX files found.\n");
@@ -21,12 +21,20 @@ char *get_gpx_fileName()
     {
         printf("Found %d GPX files:\n", num_files);
         int offset = 0;
-        for (int i = 0; i < num_files - 1; i++)
+        for (int i = 0; i < num_files; i++)
         {
-            int cnt = snprintf(res + offset, 14 + 2, "%s\n", filenames[i]);
+            if (i == (num_files - 1))
+            {
+                int cnt = snprintf(res + offset, 17 + 2, "%s", filenames[i]);
+                offset += cnt;
+                free(filenames[i]);
+                break;
+            }
+            int cnt = snprintf(res + offset, 17 + 2, "%s\n", filenames[i]);
             offset += cnt;
             free(filenames[i]);
         }
+
         free(filenames);
     }
     return res;
@@ -119,7 +127,7 @@ void rec_start(gps_t *gps_gpx)
     /* 初始化文件名 */
     char filepath[50];
     /* 以时间为文件名 */
-    snprintf(filepath, sizeof(filepath), FILE_PATH "/%02d%02d%02d%02d.gpx", gps_gpx->date.month, gps_gpx->date.day,
+    snprintf(filepath, sizeof(filepath), FILE_PATH "/%d%02d%02d_%02d%02d.gpx", gps_gpx->date.year + YEAR_BASE, gps_gpx->date.month, gps_gpx->date.day,
              gps_gpx->tim.hour + TIME_ZONE, gps_gpx->tim.minute);
     /* 检测gpx存放的固定路径是否存在，不存在就创建路径 */
     createDirectoryIfNotExists(FILE_PATH);
@@ -217,14 +225,14 @@ void rec_event_handle(void *data)
     case RECORDER_CMD_START:
         if (recorder.active == false)
             rec_start(gps_data);
-        else if (recorder.active == true && recorder.recInfo.time % 3 == 0)
+        else if (recorder.active == true && recorder.recInfo.time % 2 == 0)
             rec_point(gps_data);
         break;
     case RECORDER_CMD_PAUSE:
 
         break;
     case RECORDER_CMD_CONTINUE:
-        if (recorder.active == true && recorder.recInfo.time % 3 == 0)
+        if (recorder.active == true && recorder.recInfo.time % 2 == 0)
             rec_point(gps_data);
         break;
     case RECORDER_CMD_STOP:

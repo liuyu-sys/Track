@@ -98,6 +98,7 @@ void sd_task(void *arg)
     // i2c_mpu6050_init(I2C_NUM_0);
     while (true)
     {
+
         // i2c_mpu6050_get_accel_gyro(I2C_NUM_0, accel, gyro);
         // printf("Accel: x:%d\ty:%d\tz:%d\t, (x+y+z)/3 = %d ||\tGyro: x:%d\ty:%d\tz:%d\n", accel[0], accel[1], accel[2], (accel[0] + accel[1] + accel[2]) / 3, gyro[0], gyro[1], gyro[2]);
 

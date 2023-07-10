@@ -12,12 +12,16 @@ extern "C"
 #endif
 
     extern uint8_t recState;
+    extern char last_map_path[60];
     void ui_event_file(lv_event_t *e);
     void ui_rec_update(lv_event_t *e);
     void now_speed_call(lv_event_t *e);
     void onRecord(bool longPress);
     void set_text_statusBar(char *str);
     void rec_btn_style_set(lv_color_t bg_color, lv_color_t img_color, const void *img, lv_style_selector_t PART);
+    void changeMap();
+    void createPoint(uint8_t X, uint8_t Y);
+    void ui_event_mapBtn(lv_event_t *e);
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

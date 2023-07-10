@@ -10,6 +10,7 @@
 #include "rec_timer.h"
 
 static const char *TAG = "gps_nmea";
+gps_t gpsInfo;
 
 uint8_t hour_check(uint8_t hour)
 {
@@ -17,6 +18,20 @@ uint8_t hour_check(uint8_t hour)
         return 0;
     else
         return hour;
+}
+void Reload_map()
+{
+    static uint8_t i = 0;
+    if (i >= 2)
+    {
+        i = 0;
+        if (ui_now_scr == UI_MAP_SCR && gpsInfo.valid)
+            changeMap();
+    }
+    else
+    {
+        i++;
+    }
 }
 
 /**
@@ -29,11 +44,11 @@ uint8_t hour_check(uint8_t hour)
  */
 void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
-    gps_t *gps = NULL;
+
     switch (event_id)
     {
     case GPS_UPDATE:
-        gps = (gps_t *)event_data;
+        gpsInfo = *(gps_t *)event_data;
         /* print information parsed from GPS statements */
         ESP_LOGD(TAG, "%d/%d/%d %d:%d:%d => \r\n"
                       "latitude   = %.05f°N\r\n"
@@ -41,14 +56,15 @@ void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int
                       "altitude   = %.02fm\r\n"
                       "speed      = %fm/s\r\n"
                       "dop_h = %.03f , dop_p = %.03f, dop_v = %.03f\r\n",
-                 gps->date.year + YEAR_BASE, gps->date.month, gps->date.day,
-                 gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second,
-                 gps->latitude, gps->longitude, gps->altitude, gps->speed, gps->dop_h, gps->dop_p, gps->dop_v);
+                 gpsInfo.date.year + YEAR_BASE, gpsInfo.date.month, gpsInfo.date.day,
+                 gpsInfo.tim.hour + TIME_ZONE, gpsInfo.tim.minute, gpsInfo.tim.second,
+                 gpsInfo.latitude, gpsInfo.longitude, gpsInfo.altitude, gpsInfo.speed, gpsInfo.dop_h, gpsInfo.dop_p, gpsInfo.dop_v);
 
-        gps->tim.hour = hour_check(gps->tim.hour);
+        gpsInfo.tim.hour = hour_check(gpsInfo.tim.hour);
 
-        rec_event_handle(gps);
-        lv_event_send(ui_speed, LV_EVENT_VALUE_CHANGED, gps);
+        rec_event_handle(&gpsInfo);
+        lv_event_send(ui_speed, LV_EVENT_VALUE_CHANGED, &gpsInfo);
+        Reload_map();
         break;
     case GPS_UNKNOWN:
         /* print unknown statements */

@@ -10,7 +10,7 @@
 #include "gpx_rec.h"
 #include "convert_lat_lng.h"
 
-#define STRLEN 11
+#define STRLEN 20
 
 static const char *TAG = "ui_event";
 uint8_t recState = 0;
@@ -19,13 +19,14 @@ float last_lat = 0;
 uint32_t last_time = 0;
 double Total_trip = 0;
 
-uint32_t
-get_time(gps_t *gps)
-{
-    long totalSeconds = gps->tim.hour * 3600 + gps->tim.minute * 60 + gps->tim.second;
-    long totalDays = gps->date.day;
-    return (totalSeconds + (totalDays * 24 * 3600));
-}
+char last_map_path[60] = "";
+
+// uint32_t get_time(gps_t *gps)
+// {
+//     long totalSeconds = gps->tim.hour * 3600 + gps->tim.minute * 60 + gps->tim.second;
+//     long totalDays = gps->date.day;
+//     return (totalSeconds + (totalDays * 24 * 3600));
+// }
 
 float getSpeed(gps_t *gps)
 {
@@ -37,7 +38,7 @@ float getSpeed(gps_t *gps)
     {
         last_lng = gps->longitude;
         last_lat = gps->latitude;
-        last_time = get_time(gps);
+        last_time = recorder.recInfo.time;
         return 0;
     }
     float lng = gps->longitude;
@@ -45,11 +46,11 @@ float getSpeed(gps_t *gps)
     double distance = getDistance(lng, lat, last_lng, last_lat);
     last_lng = lng;
     last_lat = lat;
-    uint32_t now_time = get_time(gps);
+    uint32_t now_time = recorder.recInfo.time;
     float speedKmh = (distance / (now_time - last_time)) * 3.6;
     last_time = now_time;
 
-    if (gps->speed > 3)
+    if (gpsInfo.speed > 0)
     {
         if (recorder.active == true)
         {
@@ -81,24 +82,34 @@ void now_speed_call(lv_event_t *e)
     if (gps != NULL)
     {
         lv_label_set_text_fmt(ui_dayData, "%d-%02d-%02d", gps->date.year + YEAR_BASE, gps->date.month, gps->date.day);
-        lv_label_set_text_fmt(ui_speed, "%02d", (uint8_t)getSpeed(gps));
+        if (recorder.active == true)
+        {
+            getSpeed(gps);
+            // lv_label_set_text_fmt(ui_speed, "%02d", (uint8_t)getSpeed(gps));
+            lv_label_set_text_fmt(ui_speed, "%02d", (int)(gps->speed * 3.6));
+        }
+        else
+        {
+            lv_label_set_text(ui_speed, "00");
+        }
 
         lv_label_set_text_fmt(ui_comp_get_child(ui_statusBar, UI_COMP_STATUSBAR_LABEL7), "%02d : %02d", gps->tim.hour + TIME_ZONE, gps->tim.minute);
         lv_label_set_text_fmt(ui_comp_get_child(ui_statusBar2, UI_COMP_STATUSBAR_LABEL7), "%02d : %02d", gps->tim.hour + TIME_ZONE, gps->tim.minute);
 
-        snprintf(str, 9, "%.05f", gps->latitude);
-        lv_label_set_text_fmt(ui_latData, "%s°N", str);
+        snprintf(str, sizeof(str), "%.05f", gps->latitude);
+        lv_label_set_text_fmt(ui_latData, "%s", str);
 
         snprintf(str, 5, "%d", (int)gps->altitude);
         lv_label_set_text_fmt(ui_altData, "%sm", str);
 
-        snprintf(str, 9, "%.05f", gps->longitude);
-        lv_label_set_text_fmt(ui_lonData, "%s°E", str);
+        snprintf(str, sizeof(str), "%.05f", gps->longitude);
+        lv_label_set_text_fmt(ui_lonData, "%s", str);
 
-        snprintf(str, sizeof(str), "%.03f", gps->dop_h);
+        snprintf(str, sizeof(str), "%.1f", gps->dop_h);
         lv_label_set_text_fmt(ui_hor_dilData, "%s", str);
 
-        lv_label_set_text_fmt(ui_gps_valData, "%d", gps->valid);
+        snprintf(str, sizeof(str), "%.03f", gps->cog);
+        lv_label_set_text_fmt(ui_gps_valData, "%s", str);
         lv_label_set_text_fmt(ui_sateData, "%d / %d", gps->sats_in_use, gps->sats_in_view);
     }
 }
@@ -205,5 +216,80 @@ void onRecord(bool longPress)
         break;
     default:
         break;
+    }
+}
+#define MAP_Path "/sdcard/map_nor_gcj02"
+
+void createPoint(uint8_t mapX, uint8_t mapY)
+{
+    lv_obj_clear_flag(ui_mapPoint, LV_OBJ_FLAG_HIDDEN);
+    if (mapX >= 230)
+    {
+        lv_img_set_offset_x(ui_map, 240 - 256);
+        lv_obj_set_x(ui_mapPoint, mapX + (240 - 256));
+    }
+    else
+    {
+        lv_obj_set_x(ui_mapPoint, mapX);
+    }
+    if (mapY >= 230)
+    {
+        lv_img_set_offset_y(ui_map, 240 - 256);
+        lv_obj_set_y(ui_mapPoint, mapY + (240 - 256));
+    }
+    else
+    {
+        lv_obj_set_y(ui_mapPoint, mapY);
+    }
+}
+
+void changeMap()
+{
+    float lonData;
+    float latData;
+    char filePath[60];
+    // static float last_lng, last_lat;
+    if (gpsInfo.valid)
+    {
+        latData = gpsInfo.latitude;
+        lonData = gpsInfo.longitude;
+        wgs84_to_gcj02(&lonData, &latData);
+        printf("lng = %f, lat = %f\n", lonData, latData);
+        uint32_t PixelX, PixelY;
+        uint32_t tileX, tileY;
+        uint8_t zoom = 14;
+        LatLongToPixelXY(latData, lonData, zoom, &PixelX, &PixelY);
+        uint8_t tileSubX, tileSubY;
+        uint8_t pixelSubX = 0, pixelSubY = 0;
+        PixelXYToTileXY(PixelX, PixelY, 256, 256, &tileX, &tileY, &tileSubX, &tileSubY, &pixelSubX, &pixelSubY);
+        snprintf(filePath, sizeof(filePath), MAP_Path "/%d/%d/%d.bin", zoom, tileX, tileY);
+        if (strlen(last_map_path) == 0 || strcmp(last_map_path, filePath) != 0)
+        {
+            printf("%s\n", filePath);
+            lv_img_set_bin_src(filePath);
+            strcpy(last_map_path, filePath);
+        }
+        createPoint(pixelSubX, pixelSubY);
+    }
+    else
+    {
+        lv_obj_add_flag(ui_mapPoint, LV_OBJ_FLAG_HIDDEN);
+        lv_img_set_bin_src(MAP_Path "/3/6/3.bin");
+    }
+}
+
+void ui_event_mapBtn(lv_event_t *e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if (event_code == LV_EVENT_CLICKED)
+    {
+        // char *files = get_gpx_fileName();
+        // printf("%s\n", files);
+        // lv_dropdown_set_options(ui_history, files);
+        // free(files);
+        changeMap();
+        _ui_screen_change(ui_mapScr, LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);
+        ui_now_scr = UI_MAP_SCR;
     }
 }

@@ -30,7 +30,7 @@ typedef enum
 typedef struct
 {
     Recorder_Cmd_t cmd;
-    uint16_t time;
+    uint32_t time;
     float avg_speed;
 } Recorder_Info_t;
 
